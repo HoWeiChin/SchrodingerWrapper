@@ -29,11 +29,18 @@ def run_scwrl(full_pdb_path,
     bash_cmd = " ".join(['cat', hetatm_pdb_path, '>>', out_pdb])
     os.system(bash_cmd)
 
+def run_prepwizard(prepwiz_exe_path, mae_in, mae_out):
+    bash_cmd = " ".join([prepwiz_exe_path, '-nobondorders', '-noccd', '-watdist', '0', '-nometaltreat', '-propka_pH',
+                         '7', '-minimize_adj_h', '-fix', '-f', '3', mae_in, mae_out])
+    print(bash_cmd)
+    os.system(bash_cmd)
+
+"""
 
 run_scwrl('sample_files/5z62_2.pdb',
           'sample_files/hetatm_coord.pdb',
           'sample_files/out.pdb',
           scwrl_exe_path='/home/howc/Desktop/SWRL/Scwrl4'
           )
-
+"""
 # lst = ['Scwrl4', "-i", '5z62_2.pdb', "-f",'hetatm_coord.pdb',"-o", 'out.pdb', ">", "scwrl.out"]
