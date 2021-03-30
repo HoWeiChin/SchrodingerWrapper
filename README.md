@@ -48,7 +48,7 @@ Example:
 1gog.pdb,,rcsb_pdb_1GOG.fasta
 \
 \
-Explanation: Rows 1 and 2 will be skipped, because the applcation strictly requires each row to contain 2 commas in the following format: <pdb_file>,<het_atm_file>,<fasta_file>. <het_atm_file> and <fasta_file> are strictly for <pdb_file> of a particular row. Pdb_file is compulsory, as such, row 4 will be skipped. If you have no fasta file or het_atm_file, just leave a blank. For example, 'pdb_file,,' , if you want to apply scwrl on 1 pdb file and no het atom and fasta files.
+Explanation: Rows 1 and 2 will be skipped, because the applcation strictly requires each row to contain 2 commas in the following format: <pdb_file>,<het_atm_file>,<fasta_file>. <het_atm_file> and <fasta_file> are strictly for <pdb_file> of a particular row. Pdb_file is compulsory, as such, row 4 will be skipped. If you have no fasta file or het_atm_file, just leave a blank. For example, `pdb_file,,` , if you want to apply scwrl on 1 pdb file and no het atom and fasta files.
 
 \
 \
