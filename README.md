@@ -25,3 +25,18 @@ To enable multiple mutations in a pdb file, use '|' and provide the following in
 \
 <out_folder>: folder which stores pdb files from pdb_folder which are mutated.
   
+## Calling scwrl automation routine via the Commandline
+
+Syntax: ` python3 main.py -s -s_file <scwrl_file> -s_pdb <pdb_folder> -s_het <het_atm_folder> -s_seq <seq_folder> -s_out <out_folder> -s_exe <scwrl_exe>`
+\
+\
+scwrl_file: comma separated text file
+\
+\
+Example:
+1gog.pdb
+1gog.pdb,
+1gog.pdb,,
+,het_atm.txt,
+1gog.pdb,het_atm.txt,rcsb_pdb_1GOG.fasta
+1gog.pdb,,rcsb_pdb_1GOG.fasta
