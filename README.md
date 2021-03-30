@@ -34,6 +34,7 @@ scwrl_file: comma separated text file
 \
 \
 Example:
+\
 1gog.pdb
 \
 1gog.pdb,
