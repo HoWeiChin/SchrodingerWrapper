@@ -3,7 +3,8 @@ from schrodinger.structutils import minimize
 from schrodinger.structutils import analyze
 from CmdUtil import run_prepwizard
 from progress.spinner import MoonSpinner
-from time import  sleep
+from time import sleep
+from mutate_pdb_file import *
 import os
 
 # get atom with index
@@ -37,7 +38,6 @@ def get_residue(st, pdb_res_code=None, res_num=None):
         return list(
             filter(lambda residue: residue.resnum == res_num,
                    st.residue))[0]
-
 
 def add_atom(target_atm, element_to_add, bond_order,
              coords, existing_st):
@@ -80,7 +80,6 @@ def print_bonds(bonds):
         print(f'Bond type:{bond.type} Bond Order:{bond.order} '
               f'Bond from:{bond.from_style} Bond to:{bond.to_style}')
 
-
 def is_equal_formal_charge(atm, charge):
     """
 
@@ -102,14 +101,88 @@ def bonding(struc, center_atm, partners):
         bond_order = partners[partner_atm]
         struc.addBond(center_atm.index, partner_atm.index, bond_order)
 
+def sch_routine(pdb_path, mutation_file, out_dir):
+    mutate(pdb_path, mutation_file, out_dir)
+
+    for mutant in os.listdir(out_dir):
+        full_mutant = os.path.join(out_dir, mutant)
+        protein_strucs = list(structure.StructureReader(full_mutant))
+        protein_struc = protein_strucs[0]
+
+        ############## Crosslink ####################
+        res_228 = get_residue(protein_struc, res_num=228)
+        res_228_atms = list(res_228.atom)
+        SG_atm = get_atom_from_residue(res_228_atms, 'SG')
+
+        tyr_272 = get_residue(protein_struc, res_num=272)
+        tyr_272_atms = list(tyr_272.atom)
+        ce1_atm = get_atom_from_residue(tyr_272_atms, 'CE1')
+        partners = {SG_atm: 1}
+
+        bonding(protein_struc, ce1_atm, partners)
+
+        ############## Make 0 order bonds with Cu ####################
+        # note that schrodinger skips TER, hence CU starts at 4831 instead pf 4832
+        cu_res = get_residue(protein_struc, pdb_res_code='CU')
+        cu_atm = get_atom_from_residue(list(cu_res.atom), 'CU')
+        tyr_495 = get_residue(protein_struc, res_num=495)
+        res_495_atms = list(tyr_495.atom)
+        OH_tyr_495_atm = get_atom_from_residue(res_495_atms, 'OH')
+
+
+        his_496 = get_residue(protein_struc, res_num=496)
+        his_496_atms = list(his_496.atom)
+        NE2_his_496_atm = get_atom_from_residue(his_496_atms, 'NE2')
+
+        his_581 = get_residue(protein_struc, res_num=581)
+        his_581_atms = list(his_581.atom)
+        NE2_his_581_atm = get_atom_from_residue(his_581_atms, 'NE2')
+
+        F_tyr_272_atm = get_atom_from_residue(tyr_272_atms, 'F')
+
+        partners = {OH_tyr_495_atm: 0, NE2_his_496_atm: 0,
+                    NE2_his_581_atm: 0, F_tyr_272_atm: 0
+                    }
+
+        bonding(protein_struc, cu_atm, partners)
+
+        if not is_equal_formal_charge(cu_atm, 2):
+            raise Exception('CU charge is not 2.')
+
+        pdb_mae_in = mutant.split('.')[0] + '.mae'
+        with structure.StructureWriter(pdb_mae_in) as writer:
+            writer.append(protein_struc)
+
+        pdb_mae_out = mutant.split('.')[0] + '_out.mae'
+        run_prepwizard(prepwiz_exe_path='$SCHRODINGER/utilities/prepwizard',
+                       mae_in=pdb_mae_in,
+                       mae_out=pdb_mae_out
+                       )
+
+        with MoonSpinner('Optimising structure...') as bar:
+            while mutant.split('.')[0] + '_out.mae' not in os.listdir(out_dir):
+                sleep(1)
+                bar.next()
+
+        opt_protein_strucs = list(structure.StructureReader(pdb_mae_out))
+        opt_protein_struc = opt_protein_strucs[0]
+        cu_res = get_residue(opt_protein_struc, pdb_res_code='CU')
+        cu_atm = get_atom_from_residue(list(cu_res.atom), 'CU')
+
+        if not is_equal_formal_charge(cu_atm, 2):
+            cu_atm.formal_charge = 2
+            with structure.StructureWriter(pdb_mae_out) as writer:
+                writer.append(opt_protein_struc)
+
 if __name__ == "__main__":
 
 
-    gog_input_f = '1gog_modified.pdb'
+    gog_input_f = '1gog.pdb'
     gog_strucs = list(structure.StructureReader(gog_input_f))
     gog_struc = gog_strucs[0]
     atoms = list(gog_struc.atom)
-
+    cu = get_residue(gog_struc,pdb_res_code='CU')
+    print(f'cu: {cu.pdbres}')
     ############## Crosslink ####################
     res_228 = get_residue(gog_struc, res_num=228)
     res_228_atms = list(res_228.atom)
@@ -142,11 +215,14 @@ if __name__ == "__main__":
     bonding(gog_struc, cu_atm, partners)
 
     print_atoms(list(cu_atm.bonded_atoms))
+    print('###### OH #########')
+    print_atoms(list(OH_tyr_495_atm.bonded_atoms))
+    OH_tyr_495_atm.formal_charge = -1
 
     if is_equal_formal_charge(cu_atm, 2):
         print('Cu charge is 2.')
 
-    with structure.StructureWriter('1gog_processed.mae') as writer:
+    with structure.StructureWriter('1gog_processed_deprotonated.mae') as writer:
         writer.append(gog_struc)
 
     with structure.StructureWriter('1gog_processed.pdb') as writer:
@@ -154,6 +230,7 @@ if __name__ == "__main__":
 
     ### prepwizard component
 
+    
     run_prepwizard(prepwiz_exe_path='$SCHRODINGER/utilities/prepwizard',
                    mae_in='1gog_processed.mae',
                    mae_out='1gog_processed_out.mae'
@@ -174,12 +251,4 @@ if __name__ == "__main__":
         wrong_charge = cu_atm.formal_charge
         cu_atm.formal_charge = 2
         print(f'Cu charge was {wrong_charge}, it as been rectified to {cu_atm.formal_charge}.')
-
-
-
-
-
-
-
-
 
