@@ -35,8 +35,13 @@ scwrl_file: comma separated text file
 \
 Example:
 1gog.pdb
+\
 1gog.pdb,
+\
 1gog.pdb,,
+\
 ,het_atm.txt,
+\
 1gog.pdb,het_atm.txt,rcsb_pdb_1GOG.fasta
+\
 1gog.pdb,,rcsb_pdb_1GOG.fasta
