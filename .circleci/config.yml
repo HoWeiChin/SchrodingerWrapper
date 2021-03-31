@@ -9,6 +9,9 @@ jobs:
     steps:
       - checkout
       - run:
+          command: pwd
+          name: Test
+      - run:
           command: python3 -m unittest
           name: Test
 
