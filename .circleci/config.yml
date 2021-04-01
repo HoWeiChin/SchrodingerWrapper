@@ -10,11 +10,11 @@ jobs:
       - checkout
       - run:
           command: pwd
-          name: Test
+      - run:
+          command: ls -lh
       - run:
           command: python3 -m unittest
-          name: Test
-
+          
 workflows:
   main:
     jobs:
