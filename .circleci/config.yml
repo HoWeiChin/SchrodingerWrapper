@@ -2,17 +2,20 @@ version: 2.1
 
 jobs:
   build:
-    working_directory: ~/test
-    docker: # run the steps with Docker
-      # CircleCI Python images available at: https://hub.docker.com/r/circleci/python/
-    - image: circleci/python:3.8
-      auth:
-        username: mydockerhub-user
-        password: $DOCKERHUB_PASSWORD
+    
+    docker: 
+      - image: circleci/python:3.8
+    working_directory: ~/repo
 
     steps:
       - checkout
-      - setup_remote_docker
+
+      - run:
+          name: install dependencies
+          command: |
+            python3 -m venv venv
+            . venv/bin/activate
+            
       - run:
           command: python -m unittest
 
