@@ -5,13 +5,12 @@ jobs:
     
     docker: 
       - image: circleci/python:3.8
-    working_directory: ~/repo
 
     steps:
       - checkout
 
       - run:
-          command: pwd
+          command: ls -lh
 
       - run:
           name: install dependencies
