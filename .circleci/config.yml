@@ -1,24 +1,16 @@
 version: 2.1
 
-orbs:
-  python: circleci/python@0.2.1
-
 jobs:
-  test:
-    executor: python/default
+  build:
+    docker: # run the steps with Docker
+      # CircleCI Python images available at: https://hub.docker.com/r/circleci/python/
+    - image: circleci/python:3.8
+      auth:
+        username: mydockerhub-user
+        password: $DOCKERHUB_PASSWORD
+
     steps:
       - checkout
       - run:
-          command: 
-              pwd
-      - run:
-          command: cd test | 
-      - run:
-          command: ls -lh
-      - run:
           command: python -m unittest
-          
-workflows:
-  main:
-    jobs:
-      - test
+
