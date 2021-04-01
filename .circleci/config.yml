@@ -12,7 +12,7 @@ jobs:
           command: 
               pwd
       - run:
-          command: cd ~/test
+          command: cd test | 
       - run:
           command: ls -lh
       - run:
