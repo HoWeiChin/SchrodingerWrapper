@@ -5,13 +5,14 @@ orbs:
 
 jobs:
   test:
-    working_directory: ~/test
     executor: python/default
     steps:
       - checkout
       - run:
-          command: |
+          command: 
               pwd
+      - run:
+          command: cd test
       - run:
           command: ls -lh
       - run:
