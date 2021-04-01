@@ -11,6 +11,9 @@ jobs:
       - checkout
 
       - run:
+          command: pwd
+
+      - run:
           name: install dependencies
           command: |
             python3 -m venv venv
