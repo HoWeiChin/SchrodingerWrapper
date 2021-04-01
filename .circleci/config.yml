@@ -10,6 +10,9 @@ jobs:
     steps:
       - checkout
       - run:
+          command: |
+              pwd
+      - run:
           command: ls -lh
       - run:
           command: python -m unittest
