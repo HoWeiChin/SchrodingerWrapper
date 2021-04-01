@@ -1,5 +1,4 @@
 from unittest import TestCase
-
 from src.OrderedResidueNumbers import OrderedResidueNumbers
 from src.ResidueNumber import ResidueNumber
 
@@ -19,3 +18,4 @@ class TestOrderedResidueNumbers(TestCase):
         ordered_residues.get_next()
 
         self.assertRaises(IndexError, ordered_residues.get_next)
+

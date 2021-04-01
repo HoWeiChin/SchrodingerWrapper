@@ -1,5 +1,4 @@
 from unittest import TestCase
-
 from src.NullValueError import NullValueError
 from src.ResidueNumber import ResidueNumber
 from src.WrongResidueTypeError import WrongResidueTypeError

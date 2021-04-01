@@ -1,18 +1,23 @@
 version: 2.1
 
-orbs:
-  python: circleci/python@0.2.1
-
 jobs:
-  build-and-test:
-    executor: python/default
+  build:
+    
+    docker: 
+      - image: circleci/python:3.8
+
     steps:
       - checkout
-      - run:
-          command: python3 -m unittest
-          name: Test
 
-workflows:
-  main:
-    jobs:
-      - build-and-test
+      - run:
+          command: ls -lh
+
+      - run:
+          name: install dependencies
+          command: |
+            python3 -m venv venv
+            . venv/bin/activate
+            
+      - run:
+          command: python -m unittest
+

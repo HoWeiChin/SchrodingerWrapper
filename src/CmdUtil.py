@@ -1,0 +1,195 @@
+import os
+from progress.spinner import MoonSpinner
+
+
+def run_scwrl(
+        full_pdb_path,
+        out_pdb,
+        scwrl_exe_path,
+        seq_file_path=None,
+        hetatm_pdb_path=None):
+    """
+    :param full_pdb_path: path of <pdb_code>.pdb
+    :param out_pdb: name of output pdb file
+    :param scwrl_exe_path: path to scwrl exe file
+    :param scwrl_bash_alias: scwrl programme alias, eg: swrl instead of scwrl
+    :param seq_file_path: path to a .txt file telling scwrl how to do mutation
+    :param hetatm_pdb_path: path of hetatm.pdb
+    :return:
+
+    """
+    is_add_het = False
+
+    # no mutation, just add het atoms
+    if seq_file_path is None and hetatm_pdb_path:
+        bash_cmd = " ".join([scwrl_exe_path, '-i', full_pdb_path,
+                             '-f', hetatm_pdb_path, '-o', out_pdb, '> log.txt'])
+        is_add_het = True
+
+    # mutation and add het atoms
+    elif seq_file_path and hetatm_pdb_path:
+        bash_cmd = " ".join([scwrl_exe_path, '-i', full_pdb_path, '-s', seq_file_path,
+                             '-f', hetatm_pdb_path, '-o', out_pdb, '> log.txt'])
+        is_add_het = True
+
+    # mutation and don't add het atoms
+    elif seq_file_path and hetatm_pdb_path is None:
+        bash_cmd = " ".join([scwrl_exe_path, '-i', full_pdb_path, '-s', seq_file_path,
+                             '-o', out_pdb, '> log.txt'])
+
+    # plain side-chain modelling
+    else:
+        bash_cmd = " ".join([scwrl_exe_path, '-i', full_pdb_path,
+                             '-o', out_pdb, '> log.txt'])
+
+    os.system(bash_cmd)
+
+    if is_add_het:
+        bash_cmd = " ".join(['mv', '-f', out_pdb, out_pdb + '.old'])
+        os.system(bash_cmd)
+
+        bash_cmd = " ".join(['grep', '^ATOM', out_pdb + '.old', '>', out_pdb])
+        os.system(bash_cmd)
+
+        bash_cmd = " ".join(['echo', "TER", ">>", out_pdb])
+        os.system(bash_cmd)
+
+        bash_cmd = " ".join(['cat', hetatm_pdb_path, '>>', out_pdb])
+        os.system(bash_cmd)
+
+        bash_cmd = f'rm {out_pdb}.old'
+
+        os.system(bash_cmd)
+
+def run_prepwizard(prepwiz_exe_path, mae_in, mae_out):
+    bash_cmd = " ".join([prepwiz_exe_path, '-nobondorders', '-noccd', '-watdist', '0', '-nometaltreat', '-propka_pH',
+                         '7', '-minimize_adj_h', '-fix', '-f', '3', mae_in, mae_out])
+
+    os.system(bash_cmd)
+
+def check_folder(folder_path):
+    if not os.path.exists(folder_path):
+        raise Exception(f'{folder_path} is absent, pls create it first.')
+
+def file_ordering(files):
+    # files is of type list
+    result = [0, 0, 0]
+
+    for file in files:
+        if '.pdb' in file:
+            result[0] = file.strip()
+
+        if 'het' in file:
+            result[1] = file.strip()
+
+        if '.fasta' in file or 'seq' in file:
+            result[2] = file.strip()
+
+    return result
+
+def batch_scwrl(scwrl_file, pdb_folder,
+                het_atm_folder, seq_folder,
+                out_folder, scwrl_exe
+                ):
+    """
+
+    :param scwrl_file (str): file containing, pdb file, het_atm.txt (to store scwrl output)
+    :param pdb_folder (str): folder containing pdb file(s)
+    :param het_atm_folder (str): folder containing het atm txt file(s)
+    :param seq_folder (str): folder containing seq.txt file(s)
+    :param out_folder (str):
+    :return:
+    """
+    try:
+        """
+        note that scwrl_file should be comma-separated in the following manner:
+        a.pdb, het_atm_file_for_a.txt, seq_file.txt
+        
+        """
+        file = open(scwrl_file, 'r')
+        file.close()
+
+    except FileNotFoundError:
+        print(f'{scwrl_file} not present, pls check.')
+
+    check_folder(pdb_folder)
+    check_folder(out_folder)
+    check_folder(het_atm_folder)
+    check_folder(seq_folder)
+
+    with open(scwrl_file, 'r') as file:
+        lines = file.readlines()
+        row_index = 1
+        with MoonSpinner('SCWRL in progress') as bar:
+            for line in lines:
+
+                if line.count(',') != 2:
+                    row_index += 1
+                    bar.next()
+                    continue
+
+                # correct it, if users give wrong file ordering
+                pdb_file, het_file, seq_file = file_ordering(line.strip().split(','))
+
+                if pdb_file == 0:
+                    row_index += 1
+                    bar.next()
+                    continue
+
+                full_pdb_path = os.path.join(pdb_folder, pdb_file)
+
+                if het_file != 0:
+                    het_atm_pdb_file = os.path.join(het_atm_folder, het_file)
+
+                if seq_file != 0:
+                    seq_file_path = os.path.join(seq_folder, seq_file)
+
+                pdb_name = pdb_file.split('.')[0]
+                out_file = f'{pdb_name}_{row_index}_out.pdb'
+                out_file = os.path.join(out_folder, out_file)
+                #print(out_file)
+
+                if het_file == 0 and seq_file == 0:
+                    run_scwrl(full_pdb_path=full_pdb_path,
+                              out_pdb=out_file,
+                              scwrl_exe_path=scwrl_exe
+                              )
+
+                if het_file == 0 and seq_file != 0:
+                    run_scwrl(full_pdb_path=full_pdb_path,
+                              out_pdb=out_file,
+                              scwrl_exe_path=scwrl_exe,
+                              seq_file_path=seq_file_path
+                              )
+
+                if het_file != 0 and seq_file == 0:
+                    run_scwrl(full_pdb_path=full_pdb_path,
+                              out_pdb=out_file,
+                              scwrl_exe_path=scwrl_exe,
+                              hetatm_pdb_path=het_atm_pdb_file
+                              )
+
+                if het_file != 0 and seq_file != 0:
+                    run_scwrl(full_pdb_path=full_pdb_path,
+                              out_pdb=out_file,
+                              scwrl_exe_path=scwrl_exe,
+                              seq_file_path=seq_file_path,
+                              hetatm_pdb_path=het_atm_pdb_file
+                              )
+
+                row_index += 1
+                bar.next()
+
+if __name__ == '__main__':
+    batch_scwrl(scwrl_file='scwrl.txt', pdb_folder='pdb_folder',
+                het_atm_folder='het_atm_folder', seq_folder='seq_folder',
+                out_folder='out_folder', scwrl_exe='/home/howc/Desktop/SWRL/Scwrl4')
+
+"""
+
+run_scwrl('sample_files/5z62_2.pdb',
+          'sample_files/hetatm_coord.pdb',
+          'sample_files/out.pdb',
+          scwrl_exe_path='/home/howc/Desktop/SWRL/Scwrl4'
+          )
+"""
