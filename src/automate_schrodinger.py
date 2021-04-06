@@ -2,7 +2,7 @@ from schrodinger import structure
 from CmdUtil import run_prepwizard
 from progress.spinner import MoonSpinner
 from time import sleep
-from mutate_pdb_file import *
+from Process import Process
 import os
 
 # get atom with index
@@ -100,7 +100,8 @@ def bonding(struc, center_atm, partners):
         struc.addBond(center_atm.index, partner_atm.index, bond_order)
 
 def sch_routine(pdb_path, mutation_file, out_dir):
-    mutate(pdb_path, mutation_file, out_dir)
+    p = Process(pdb_path, mutation_file, out_dir)
+    p.process()
 
     for mutant in os.listdir(out_dir):
         full_mutant = os.path.join(out_dir, mutant)
@@ -175,7 +176,7 @@ def sch_routine(pdb_path, mutation_file, out_dir):
 if __name__ == "__main__":
 
 
-    gog_input_f = '1gog.pdb'
+    gog_input_f = '1_1gog.pdb'
     gog_strucs = list(structure.StructureReader(gog_input_f))
     gog_struc = gog_strucs[0]
     atoms = list(gog_struc.atom)

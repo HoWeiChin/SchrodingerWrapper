@@ -112,10 +112,18 @@ def batch_scwrl(scwrl_file, pdb_folder,
     except FileNotFoundError:
         print(f'{scwrl_file} not present, pls check.')
 
+    if not os.path.exists(out_folder):
+        os.makedirs(out_folder)
+
+    if het_atm_folder:
+        check_folder(het_atm_folder)
+
+    if seq_folder:
+        check_folder(seq_folder)
+
+    print(os.path.exists(het_atm_folder))
+
     check_folder(pdb_folder)
-    check_folder(out_folder)
-    check_folder(het_atm_folder)
-    check_folder(seq_folder)
 
     with open(scwrl_file, 'r') as file:
         lines = file.readlines()
@@ -138,16 +146,16 @@ def batch_scwrl(scwrl_file, pdb_folder,
 
                 full_pdb_path = os.path.join(pdb_folder, pdb_file)
 
-                if het_file != 0:
-                    het_atm_pdb_file = os.path.join(het_atm_folder, het_file)
+                if het_file != 0 and het_atm_folder is None:
+                    continue
 
-                if seq_file != 0:
-                    seq_file_path = os.path.join(seq_folder, seq_file)
+                if seq_file != 0 and seq_folder is None:
+                    continue
 
                 pdb_name = pdb_file.split('.')[0]
                 out_file = f'{pdb_name}_{row_index}_out.pdb'
                 out_file = os.path.join(out_folder, out_file)
-                #print(out_file)
+                print(out_file)
 
                 if het_file == 0 and seq_file == 0:
                     run_scwrl(full_pdb_path=full_pdb_path,
@@ -155,21 +163,25 @@ def batch_scwrl(scwrl_file, pdb_folder,
                               scwrl_exe_path=scwrl_exe
                               )
 
-                if het_file == 0 and seq_file != 0:
+                elif het_file == 0 and seq_file != 0:
+                    seq_file_path = os.path.join(seq_folder, seq_file)
                     run_scwrl(full_pdb_path=full_pdb_path,
                               out_pdb=out_file,
                               scwrl_exe_path=scwrl_exe,
                               seq_file_path=seq_file_path
                               )
 
-                if het_file != 0 and seq_file == 0:
+                elif het_file != 0 and seq_file == 0:
+                    het_atm_pdb_file = os.path.join(het_atm_folder, het_file)
                     run_scwrl(full_pdb_path=full_pdb_path,
                               out_pdb=out_file,
                               scwrl_exe_path=scwrl_exe,
                               hetatm_pdb_path=het_atm_pdb_file
                               )
 
-                if het_file != 0 and seq_file != 0:
+                elif het_file != 0 and seq_file != 0:
+                    het_atm_pdb_file = os.path.join(het_atm_folder, het_file)
+                    seq_file_path = os.path.join(seq_folder, seq_file)
                     run_scwrl(full_pdb_path=full_pdb_path,
                               out_pdb=out_file,
                               scwrl_exe_path=scwrl_exe,
