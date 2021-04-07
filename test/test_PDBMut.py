@@ -21,7 +21,7 @@ class TestPDBMut(TestCase):
         PDBMut(PDBFile(None, 'test.pdb'), None).save_pdb(pdb_folder, 'test')
         self.assertTrue('modified_test.pdb' in os.listdir(pdb_folder))
 
-    def test_mutate_and_save_pdb(self):
+    def test_mutate_and_save_pdb_1_mutation(self):
         pdb_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'test_files')
         pdb_file = '1gog.pdb'
         mutations = [AtomToChange('CG', '636', 'F', 'F')]
@@ -29,6 +29,26 @@ class TestPDBMut(TestCase):
         new_content = pdb_mut.mutate_pdb()
         pdb_mut.save_pdb(pdb_folder, new_content)
 
-        result = open(os.path.join(pdb_folder, 'modified_1gog.pdb')).read()[5393]
-        expected_result = open(os.path.join(pdb_folder, 'expected_modified_1gog.pdb')).read()[5393]
+        result = open(os.path.join(pdb_folder, 'modified_1gog.pdb')).readlines()[5393].strip()
+        expected_result = open(os.path.join(pdb_folder, 'expected_modified_1gog.pdb')).readlines()[5393].strip()
         self.assertEqual(expected_result, result)
+
+    def test_mutate_and_save_pdb_2_mutations(self):
+        pdb_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'test_files')
+        pdb_file = '1gog_for_2_mutations.pdb'
+        mutations = [AtomToChange('CG', '636', 'F', 'F'), AtomToChange('CD1', '635', 'CD2', 'C')]
+        pdb_mut = PDBMut(PDBFile(pdb_folder, pdb_file), mutations)
+        new_content = pdb_mut.mutate_pdb()
+        print(new_content)
+        pdb_mut.save_pdb(pdb_folder, new_content)
+
+        modified_contents = open(os.path.join(pdb_folder, 'modified_1gog_for_2_mutations.pdb')).readlines()
+        expected_contents = open(os.path.join(pdb_folder, 'expected_modified_1gog_for_2_mutations.pdb')).readlines()
+
+        result_1 = modified_contents[5393]
+        expected_result_1 = expected_contents[5393]
+
+        result_2 = modified_contents[5387]
+        expected_result_2 = expected_contents[5387]
+
+        self.assertTrue(expected_result_1 == result_1 and result_2 == expected_result_2)
