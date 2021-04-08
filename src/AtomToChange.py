@@ -1,4 +1,4 @@
-from Atom import Atom
+from src.Atom import Atom
 
 class AtomToChange(Atom):
     def __init__(self, old_atom, res_number, new_atom, new_atm_ele):

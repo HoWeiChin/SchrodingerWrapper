@@ -1,43 +1,50 @@
 import argparse
 import os
-from automate_schrodinger import *
-from CmdUtil import *
+from CmdUtil import batch_scwrl
 
 parser = argparse.ArgumentParser()
-parser.add_argument('-s_file', action='store', help='scwrl file path')
+parser.add_argument('-s', action='store', help='scwrl file path')
 parser.add_argument('-pdb', action='store', help='pdb folder for scwrl')
 parser.add_argument('-het', action='store', help='het_atm folder path for scwrl')
-parser.add_argument('-seq', action='store', help='seq_folder path for scwrl')
+parser.add_argument('-mut', action='store_true', help='enable mutation for scwrl')
 parser.add_argument('-exe', action='store', help='scwrl exe path')
 parser.add_argument('-m', action='store', help='mutation file for schrodinger')
 
 args = parser.parse_args()
 
+print(args.mut)
+
 if not args.pdb:
     print('You forgot to provide a pdb folder.')
 
-elif not args.s_file:
+elif not args.s:
     print('You forgot to provide a scwrl text file.')
 
 elif not args.exe:
     print('You forgot to provide a scwrl exe file.')
 
-elif not args.het and not args.seq:
+elif not args.het and not args.mut:
     out_folder_path = os.path.join(os.getcwd(), args.pdb + '/scwrl_out')
-    batch_scwrl(scwrl_file=args.s_file, pdb_folder=args.pdb,
+    batch_scwrl(scwrl_file=args.s, pdb_folder=args.pdb,
                 het_atm_folder=None, seq_folder=None,
                 out_folder=out_folder_path, scwrl_exe=args.exe)
 
-elif args.het and not args.seq:
+elif args.het and not args.mut:
     out_folder_path = os.path.join(os.getcwd(), args.pdb + '/scwrl_out')
-    batch_scwrl(scwrl_file=args.s_file, pdb_folder=args.pdb,
+    batch_scwrl(scwrl_file=args.s, pdb_folder=args.pdb,
                 het_atm_folder=args.het, seq_folder=None,
                 out_folder=out_folder_path, scwrl_exe=args.exe)
 
-elif args.het and args.seq:
+elif not args.het and args.mut:
     out_folder_path = os.path.join(os.getcwd(), args.pdb + '/scwrl_out')
-    batch_scwrl(scwrl_file=args.s_file, pdb_folder=args.pdb,
-                het_atm_folder=args.het, seq_folder=args.seq,
+    batch_scwrl(scwrl_file=args.s, pdb_folder=args.pdb,
+                het_atm_folder=args.het, seq_folder='seq_f',
+                out_folder=out_folder_path, scwrl_exe=args.exe)
+
+elif args.het and args.mut:
+    out_folder_path = os.path.join(os.getcwd(), args.pdb + '/scwrl_out')
+    batch_scwrl(scwrl_file=args.s, pdb_folder=args.pdb,
+                het_atm_folder=args.het, seq_folder='seq_f',
                 out_folder=out_folder_path, scwrl_exe=args.exe)
 """
 

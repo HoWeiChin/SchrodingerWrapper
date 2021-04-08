@@ -176,7 +176,7 @@ def sch_routine(pdb_path, mutation_file, out_dir):
 if __name__ == "__main__":
 
 
-    gog_input_f = '1_1gog.pdb'
+    gog_input_f = '1gog.pdb'
     gog_strucs = list(structure.StructureReader(gog_input_f))
     gog_struc = gog_strucs[0]
     atoms = list(gog_struc.atom)

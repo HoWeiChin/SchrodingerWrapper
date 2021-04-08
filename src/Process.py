@@ -1,12 +1,12 @@
 import os
-from PDBFile import PDBFile
-from PDBMut import PDBMut
-from AtomToChange import AtomToChange
+from src.PDBFile import PDBFile
+from src.PDBMut import PDBMut
+from src.AtomToChange import AtomToChange
 from progress.spinner import MoonSpinner
 
 
 class Process:
-    def __init__(self, pdb_folder, mut_file, out_dir):
+    def __init__(self, pdb_folder: str, mut_file: str, out_dir: str):
         """
 
         :param pdb_folder: abs path to folder containing pdb files (needs to make sure ordering of pdb files correspond to those in mut.txt)
@@ -53,8 +53,7 @@ class Process:
         with MoonSpinner('Mutating PDBs') as bar:
             for i in range(len(pdbs)):
                 curr_pdb = pdbs[i]
-                print(mutations[1])
-                print(i)
+
                 if '|' in mutations[i]:
                     curr_mutations = mutations[i].strip('\n').split('|')
 
@@ -67,17 +66,11 @@ class Process:
                     if mutation != '':
                         residue_num, old_atm, new_atm, new_ele = mutation.split(',')
                         atms_to_chg.append(AtomToChange(old_atom=old_atm,
-                                                      res_number=residue_num,
-                                                      new_atom=new_atm, new_atm_ele=new_ele)
-                                         )
+                                                        res_number=residue_num,
+                                                        new_atom=new_atm, new_atm_ele=new_ele)
+                                           )
                 pdb_mutator = PDBMut(curr_pdb, atms_to_chg)
                 mutated_pdb_content = pdb_mutator.mutate_pdb()
                 pdb_mutator.save_pdb(self.__out_dir, mutated_pdb_content)
 
                 bar.next()
-
-
-
-
-
-

@@ -1,6 +1,6 @@
-import os
 from progress.spinner import MoonSpinner
-
+from ScwrlMutant import mutate
+import os
 
 def run_scwrl(
         full_pdb_path,
@@ -61,15 +61,18 @@ def run_scwrl(
 
         os.system(bash_cmd)
 
+
 def run_prepwizard(prepwiz_exe_path, mae_in, mae_out):
     bash_cmd = " ".join([prepwiz_exe_path, '-nobondorders', '-noccd', '-watdist', '0', '-nometaltreat', '-propka_pH',
                          '7', '-minimize_adj_h', '-fix', '-f', '3', mae_in, mae_out])
 
     os.system(bash_cmd)
 
-def check_folder(folder_path):
+
+def check_folder(folder_path: str):
     if not os.path.exists(folder_path):
         raise Exception(f'{folder_path} is absent, pls create it first.')
+
 
 def file_ordering(files):
     # files is of type list
@@ -82,14 +85,15 @@ def file_ordering(files):
         if 'het' in file:
             result[1] = file.strip()
 
-        if '.fasta' in file or 'seq' in file:
+        if file.count(':') == 2:
             result[2] = file.strip()
 
     return result
 
-def batch_scwrl(scwrl_file, pdb_folder,
-                het_atm_folder, seq_folder,
-                out_folder, scwrl_exe
+
+def batch_scwrl(scwrl_file: str, pdb_folder: str,
+                het_atm_folder: str, seq_folder: str,
+                out_folder: str, scwrl_exe: str
                 ):
     """
 
@@ -119,15 +123,15 @@ def batch_scwrl(scwrl_file, pdb_folder,
         check_folder(het_atm_folder)
 
     if seq_folder:
-        check_folder(seq_folder)
-
-    print(os.path.exists(het_atm_folder))
+        if not os.path.exists(seq_folder):
+            os.mkdirs(seq_folder)
 
     check_folder(pdb_folder)
 
     with open(scwrl_file, 'r') as file:
         lines = file.readlines()
         row_index = 1
+
         with MoonSpinner('SCWRL in progress') as bar:
             for line in lines:
 
@@ -138,59 +142,68 @@ def batch_scwrl(scwrl_file, pdb_folder,
 
                 # correct it, if users give wrong file ordering
                 pdb_file, het_file, seq_file = file_ordering(line.strip().split(','))
-
-                if pdb_file == 0:
+                print(f'{pdb_file} {het_file} {seq_file}')
+                if pdb_file == 0 or (het_file != 0 and het_atm_folder is None) or (seq_file != 0 and seq_folder is None):
                     row_index += 1
                     bar.next()
                     continue
 
                 full_pdb_path = os.path.join(pdb_folder, pdb_file)
-
-                if het_file != 0 and het_atm_folder is None:
-                    continue
-
-                if seq_file != 0 and seq_folder is None:
-                    continue
-
                 pdb_name = pdb_file.split('.')[0]
                 out_file = f'{pdb_name}_{row_index}_out.pdb'
                 out_file = os.path.join(out_folder, out_file)
-                print(out_file)
 
-                if het_file == 0 and seq_file == 0:
-                    run_scwrl(full_pdb_path=full_pdb_path,
-                              out_pdb=out_file,
-                              scwrl_exe_path=scwrl_exe
-                              )
 
-                elif het_file == 0 and seq_file != 0:
-                    seq_file_path = os.path.join(seq_folder, seq_file)
-                    run_scwrl(full_pdb_path=full_pdb_path,
-                              out_pdb=out_file,
-                              scwrl_exe_path=scwrl_exe,
-                              seq_file_path=seq_file_path
-                              )
+                if het_file == 0:
 
-                elif het_file != 0 and seq_file == 0:
+                    if seq_file == 0:
+                        run_scwrl(full_pdb_path=full_pdb_path,
+                                  out_pdb=out_file,
+                                  scwrl_exe_path=scwrl_exe
+                                  )
+
+                    elif seq_file != 0:
+                        residue_num, mutant_aa, chain = seq_file.split(':')
+
+                        if chain == '':
+                            chain = None
+
+                        _, seq_file_path = mutate(seq_folder, full_pdb_path, int(residue_num), mutant_aa, chain)
+                        print(seq_file_path)
+                        run_scwrl(full_pdb_path=full_pdb_path,
+                                  out_pdb=out_file,
+                                  scwrl_exe_path=scwrl_exe,
+                                  seq_file_path=seq_file_path
+                                  )
+
+                if het_file != 0:
                     het_atm_pdb_file = os.path.join(het_atm_folder, het_file)
-                    run_scwrl(full_pdb_path=full_pdb_path,
-                              out_pdb=out_file,
-                              scwrl_exe_path=scwrl_exe,
-                              hetatm_pdb_path=het_atm_pdb_file
-                              )
 
-                elif het_file != 0 and seq_file != 0:
-                    het_atm_pdb_file = os.path.join(het_atm_folder, het_file)
-                    seq_file_path = os.path.join(seq_folder, seq_file)
-                    run_scwrl(full_pdb_path=full_pdb_path,
-                              out_pdb=out_file,
-                              scwrl_exe_path=scwrl_exe,
-                              seq_file_path=seq_file_path,
-                              hetatm_pdb_path=het_atm_pdb_file
-                              )
+                    if seq_file == 0:
+                        run_scwrl(full_pdb_path=full_pdb_path,
+                                  out_pdb=out_file,
+                                  scwrl_exe_path=scwrl_exe,
+                                  hetatm_pdb_path=het_atm_pdb_file
+                                  )
+
+                    if seq_file != 0:
+
+                        residue_num, mutant_aa, chain = seq_file.split(':')
+                        if chain == '':
+                            chain = None
+
+                        _, seq_file_path = mutate(seq_folder, full_pdb_path, int(residue_num), mutant_aa, chain)
+
+                        run_scwrl(full_pdb_path=full_pdb_path,
+                                  out_pdb=out_file,
+                                  scwrl_exe_path=scwrl_exe,
+                                  seq_file_path=seq_file_path,
+                                  hetatm_pdb_path=het_atm_pdb_file
+                                  )
 
                 row_index += 1
                 bar.next()
+
 
 if __name__ == '__main__':
     batch_scwrl(scwrl_file='scwrl.txt', pdb_folder='pdb_folder',
