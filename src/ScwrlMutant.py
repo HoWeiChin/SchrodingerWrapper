@@ -57,7 +57,6 @@ def mutate(
     repeated_res = set()
     for residue in residue_list:
         if residue.resnum in repeated_res or not residue.isStandardResidue() or residue.__len__() <= 1:
-            print(residue.__len__())
             continue
 
         three_letter_res = residue.pdbres.capitalize().strip()

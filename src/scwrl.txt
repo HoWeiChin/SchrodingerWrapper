@@ -1,10 +1,1 @@
-1gog.pdb
-1gog.pdb,
-1gog.pdb,,
-1gog.pdb,,het_atm.txt
-,het_atm.txt,
-1gog.pdb,het_atm.txt,
-1gog.pdb,,
-1goh.pdb,,
-1ubq.pdb,,
-1og2A.pdb,31:E:A,
+1gog.pdb,31:E:A,het_atm.txt
