@@ -13,7 +13,7 @@
   3. -het : a **path** to a folder which contains het-atom txt files for scwrl
   4. -mut : invoke this flag **only** if you wan scwrl to perform mutation 
   5. -exe : **path** to a scwrl exe file 
-  6. -m   : to be filled up later
+  6. -m   : mutation file for schrodinger, must be used in conjuction with -het flag. 
 
 ## File Directory
 In your project folder you will need to supply:
@@ -44,5 +44,8 @@ If you would like to omit an optional input, do something like:
 Note that, how you order <pdb_file>, <het_atom_file>, <mutation> does not matter as the applcation has a logic to sort them. 
 But, where possible, do provide the input in the following order: <pdb_file>, <het_atom_file>, <mutation>.
   
+## The mutation file (for -m flag)
+
+
 ## Future
 Set up CI/CD, code refactoring. More unit-testing, current test cases are minimal.
