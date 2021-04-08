@@ -56,7 +56,9 @@ def add_atom(target_atm, element_to_add, bond_order,
 
 #get atom with a pdbname in mind
 def get_atom_from_residue(atoms, atm_pdbname):
-    return list(filter(lambda atom: atom.pdbname.replace(' ', '') == atm_pdbname, atoms))[0]
+
+    atom = list(filter(lambda atom: atom.pdbname.replace(' ', '') == atm_pdbname, atoms))[0]
+    return atom
 
 def print_atoms(atoms):
     """
@@ -100,10 +102,18 @@ def bonding(struc, center_atm, partners):
         struc.addBond(center_atm.index, partner_atm.index, bond_order)
 
 def sch_routine(pdb_path, mutation_file, out_dir):
+    """
+
+    :param pdb_path: path to folder containing pdb files (usually after scwrl has been applied)
+    :param mutation_file: path to mutation file
+    :param out_dir: to save pdb files which atoms of some residues have been changed.
+    :return:
+    """
     p = Process(pdb_path, mutation_file, out_dir)
     p.process()
 
     for mutant in os.listdir(out_dir):
+        print(f'Processing pdb {mutant}')
         full_mutant = os.path.join(out_dir, mutant)
         protein_strucs = list(structure.StructureReader(full_mutant))
         protein_struc = protein_strucs[0]

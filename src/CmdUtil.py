@@ -137,17 +137,18 @@ def batch_scwrl(scwrl_file: str, pdb_folder: str,
 
                 if line.count(',') != 2:
                     row_index += 1
-                    bar.next()
+                    #bar.next()
                     continue
 
                 # correct it, if users give wrong file ordering
                 pdb_file, het_file, seq_file = file_ordering(line.strip().split(','))
-                print(f'{pdb_file} {het_file} {seq_file}')
+                #print(f'{pdb_file} {het_file} {seq_file}')
                 if pdb_file == 0 or (het_file != 0 and het_atm_folder is None) or (seq_file != 0 and seq_folder is None):
                     row_index += 1
-                    bar.next()
+                    #bar.next()
                     continue
 
+                print(f'Processing {pdb_file} with scwrl')
                 full_pdb_path = os.path.join(pdb_folder, pdb_file)
                 pdb_name = pdb_file.split('.')[0]
                 out_file = f'{pdb_name}_{row_index}_out.pdb'
@@ -169,7 +170,6 @@ def batch_scwrl(scwrl_file: str, pdb_folder: str,
                             chain = None
 
                         _, seq_file_path = mutate(seq_folder, full_pdb_path, int(residue_num), mutant_aa, chain)
-                        print(seq_file_path)
                         run_scwrl(full_pdb_path=full_pdb_path,
                                   out_pdb=out_file,
                                   scwrl_exe_path=scwrl_exe,
@@ -202,7 +202,7 @@ def batch_scwrl(scwrl_file: str, pdb_folder: str,
                                   )
 
                 row_index += 1
-                bar.next()
+                #bar.next()
 
 
 if __name__ == '__main__':

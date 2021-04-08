@@ -1,7 +1,7 @@
 import os
-from src.PDBFile import PDBFile
-from src.PDBMut import PDBMut
-from src.AtomToChange import AtomToChange
+from PDBFile import PDBFile
+from PDBMut import PDBMut
+from AtomToChange import AtomToChange
 from progress.spinner import MoonSpinner
 
 
@@ -54,11 +54,13 @@ class Process:
             for i in range(len(pdbs)):
                 curr_pdb = pdbs[i]
 
-                if '|' in mutations[i]:
-                    curr_mutations = mutations[i].strip('\n').split('|')
+                try:
+                    if '|' in mutations[i]:
+                        curr_mutations = mutations[i].strip('\n').split('|')
 
-                elif '|' not in mutations[i]:
-                    raise ValueError('must provide | inside mutation text file.')
+                except ValueError:
+                    print(f'must provide | inside mutation text file, skipping file {curr_pdb.file}')
+                    continue
 
                 atms_to_chg = []
 

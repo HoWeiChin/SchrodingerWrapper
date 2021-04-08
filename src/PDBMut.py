@@ -1,5 +1,5 @@
 import os
-from src.PatternHunter import PatternHunter
+from PatternHunter import PatternHunter
 
 
 class PDBMut:
