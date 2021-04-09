@@ -33,9 +33,12 @@ Each row of the scwrl file looks like: pdb_file, het_atom_file, mutation.
 mutation has the following format: residue-number:mutant amino acid:polypeptide chain
 Example: `1og2A.pdb,het_atm.txt,31:E:A`
 \
+\
 Just a reminder, only pdb_file is compulsory, het_atom file and mutation are optional inputs.
 \
+\
 Take note that the application only process a row of the scwrl file when there is 2 commas.
+\
 \
 If, for example, this is present in the scwrl file: `1gog.pdb,`, the application will skip that line.
   
