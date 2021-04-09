@@ -101,16 +101,19 @@ def bonding(struc, center_atm, partners):
         bond_order = partners[partner_atm]
         struc.addBond(center_atm.index, partner_atm.index, bond_order)
 
-def sch_routine(pdb_path, mutation_file, out_dir):
+def sch_routine(pdb_path, mutation_file, is_cross_link, is_zero_order_bonding, is_check_cu_charge, out_dir):
     """
 
+    :param pdb_path: path to folder containing pdb files (usually after scwrl has been applied)
+    :param mutation_file: path to mutation file
     :param pdb_path: path to folder containing pdb files (usually after scwrl has been applied)
     :param mutation_file: path to mutation file
     :param out_dir: to save pdb files which atoms of some residues have been changed.
     :return:
     """
-    p = Process(pdb_path, mutation_file, out_dir)
-    p.process()
+    if mutation_file:
+        p = Process(pdb_path, mutation_file, out_dir)
+        p.process()
 
     for mutant in os.listdir(out_dir):
         print(f'Processing pdb {mutant}')
@@ -118,70 +121,78 @@ def sch_routine(pdb_path, mutation_file, out_dir):
         protein_strucs = list(structure.StructureReader(full_mutant))
         protein_struc = protein_strucs[0]
 
-        ############## Crosslink ####################
-        res_228 = get_residue(protein_struc, res_num=228)
-        res_228_atms = list(res_228.atom)
-        SG_atm = get_atom_from_residue(res_228_atms, 'SG')
+        if is_cross_link:
+            print('cross linking')
+            ############## Crosslink ####################
+            res_228 = get_residue(protein_struc, res_num=228)
+            res_228_atms = list(res_228.atom)
+            SG_atm = get_atom_from_residue(res_228_atms, 'SG')
 
-        tyr_272 = get_residue(protein_struc, res_num=272)
-        tyr_272_atms = list(tyr_272.atom)
-        ce1_atm = get_atom_from_residue(tyr_272_atms, 'CE1')
-        partners = {SG_atm: 1}
+            tyr_272 = get_residue(protein_struc, res_num=272)
+            tyr_272_atms = list(tyr_272.atom)
+            ce1_atm = get_atom_from_residue(tyr_272_atms, 'CE1')
+            partners = {SG_atm: 1}
 
-        bonding(protein_struc, ce1_atm, partners)
+            bonding(protein_struc, ce1_atm, partners)
 
-        ############## Make 0 order bonds with Cu ####################
-        # note that schrodinger skips TER, hence CU starts at 4831 instead pf 4832
-        cu_res = get_residue(protein_struc, pdb_res_code='CU')
-        cu_atm = get_atom_from_residue(list(cu_res.atom), 'CU')
-        tyr_495 = get_residue(protein_struc, res_num=495)
-        res_495_atms = list(tyr_495.atom)
-        OH_tyr_495_atm = get_atom_from_residue(res_495_atms, 'OH')
+        if is_zero_order_bonding:
+            print('forming 0 order bonds')
+            ############## Make 0 order bonds with Cu ####################
+            # note that schrodinger skips TER, hence CU starts at 4831 instead pf 4832
+            cu_res = get_residue(protein_struc, pdb_res_code='CU')
+            cu_atm = get_atom_from_residue(list(cu_res.atom), 'CU')
+            tyr_495 = get_residue(protein_struc, res_num=495)
+            res_495_atms = list(tyr_495.atom)
+            OH_tyr_495_atm = get_atom_from_residue(res_495_atms, 'OH')
 
+            his_496 = get_residue(protein_struc, res_num=496)
+            his_496_atms = list(his_496.atom)
+            NE2_his_496_atm = get_atom_from_residue(his_496_atms, 'NE2')
 
-        his_496 = get_residue(protein_struc, res_num=496)
-        his_496_atms = list(his_496.atom)
-        NE2_his_496_atm = get_atom_from_residue(his_496_atms, 'NE2')
+            his_581 = get_residue(protein_struc, res_num=581)
+            his_581_atms = list(his_581.atom)
+            NE2_his_581_atm = get_atom_from_residue(his_581_atms, 'NE2')
 
-        his_581 = get_residue(protein_struc, res_num=581)
-        his_581_atms = list(his_581.atom)
-        NE2_his_581_atm = get_atom_from_residue(his_581_atms, 'NE2')
+            F_tyr_272_atm = get_atom_from_residue(tyr_272_atms, 'F')
 
-        F_tyr_272_atm = get_atom_from_residue(tyr_272_atms, 'F')
+            partners = {OH_tyr_495_atm: 0, NE2_his_496_atm: 0,
+                        NE2_his_581_atm: 0, F_tyr_272_atm: 0
+                        }
 
-        partners = {OH_tyr_495_atm: 0, NE2_his_496_atm: 0,
-                    NE2_his_581_atm: 0, F_tyr_272_atm: 0
-                    }
+            bonding(protein_struc, cu_atm, partners)
 
-        bonding(protein_struc, cu_atm, partners)
+            if not is_equal_formal_charge(cu_atm, 2):
+                raise Exception('CU charge is not 2.')
 
-        if not is_equal_formal_charge(cu_atm, 2):
-            raise Exception('CU charge is not 2.')
-
-        pdb_mae_in = mutant.split('.')[0] + '.mae'
+        pdb_mae_in = mutant.split('.')[0] + '_sch.mae'
         with structure.StructureWriter(pdb_mae_in) as writer:
             writer.append(protein_struc)
 
-        pdb_mae_out = mutant.split('.')[0] + '_out.mae'
+        pdb_mae_out = mutant.split('.')[0] + '.mae'
+        print(f'{pdb_mae_in} {pdb_mae_out}')
         run_prepwizard(prepwiz_exe_path='$SCHRODINGER/utilities/prepwizard',
                        mae_in=pdb_mae_in,
                        mae_out=pdb_mae_out
                        )
 
         with MoonSpinner('Optimising structure...') as bar:
-            while mutant.split('.')[0] + '_out.mae' not in os.listdir(out_dir):
+            while pdb_mae_out not in os.listdir(os.getcwd()):
                 sleep(1)
                 bar.next()
 
-        opt_protein_strucs = list(structure.StructureReader(pdb_mae_out))
-        opt_protein_struc = opt_protein_strucs[0]
-        cu_res = get_residue(opt_protein_struc, pdb_res_code='CU')
-        cu_atm = get_atom_from_residue(list(cu_res.atom), 'CU')
+        os.remove(pdb_mae_in)
+        os.remove(mutant.split('.')[0] + '_sch.log')
 
-        if not is_equal_formal_charge(cu_atm, 2):
-            cu_atm.formal_charge = 2
-            with structure.StructureWriter(pdb_mae_out) as writer:
-                writer.append(opt_protein_struc)
+        if is_check_cu_charge:
+            opt_protein_strucs = list(structure.StructureReader(pdb_mae_out))
+            opt_protein_struc = opt_protein_strucs[0]
+            cu_res = get_residue(opt_protein_struc, pdb_res_code='CU')
+            cu_atm = get_atom_from_residue(list(cu_res.atom), 'CU')
+
+            if not is_equal_formal_charge(cu_atm, 2):
+                cu_atm.formal_charge = 2
+                with structure.StructureWriter(pdb_mae_out) as writer:
+                    writer.append(opt_protein_struc)
 
 if __name__ == "__main__":
 
