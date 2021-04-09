@@ -44,6 +44,7 @@ If you would like to omit an optional input, do something like:
 
 Note that, how you order <pdb_file>, <het_atom_file>, <mutation> does not matter as the applcation has a logic to sort them. 
 But, where possible, do provide the input in the following order: <pdb_file>, <het_atom_file>, <mutation>.
+Also, note that if you supply a het_atom file without supplying the het_atm flag, the application will skip over a pdb file associated with a het_atom file.
   
 ## The mutation file (for -m flag)
 The original intention was to enable multiple mutations for a pdb file, where multiple mutations are delimited by a '|'. Hence, it's mandatory to supply '|' inside the mutation file.
