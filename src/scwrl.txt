@@ -1,3 +1,2 @@
-1gog.pdb,,het_atm.txt
-1goh.pdb,,
-1og2.pdb,,
+1gog.pdb,280:E:A,het_atm.txt,272|OH|F|F
+1goh.pdb,,280:E:A

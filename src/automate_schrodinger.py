@@ -101,19 +101,19 @@ def bonding(struc, center_atm, partners):
         bond_order = partners[partner_atm]
         struc.addBond(center_atm.index, partner_atm.index, bond_order)
 
-def sch_routine(pdb_path, mutation_file, is_cross_link, is_zero_order_bonding, is_check_cu_charge, out_dir):
+def sch_routine(pdb_path, scwrl_file, is_cross_link, is_zero_order_bonding, is_check_cu_charge, out_dir):
     """
 
     :param pdb_path: path to folder containing pdb files (usually after scwrl has been applied)
-    :param mutation_file: path to mutation file
+    :param scwrl_file: path to scwrl file
     :param pdb_path: path to folder containing pdb files (usually after scwrl has been applied)
     :param mutation_file: path to mutation file
     :param out_dir: to save pdb files which atoms of some residues have been changed.
     :return:
     """
-    if mutation_file:
-        p = Process(pdb_path, mutation_file, out_dir)
-        p.process()
+
+    p = Process(pdb_path, scwrl_file, out_dir)
+    p.process()
 
     for mutant in os.listdir(out_dir):
         print(f'Processing pdb {mutant}')

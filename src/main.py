@@ -3,27 +3,25 @@ import os
 from CmdUtil import batch_scwrl
 from automate_schrodinger import sch_routine
 
-
 parser = argparse.ArgumentParser()
 parser.add_argument('-s', action='store', help='scwrl file path')
 parser.add_argument('-pdb', action='store', help='pdb folder for scwrl')
 parser.add_argument('-het', action='store', help='het_atm folder path for scwrl')
 parser.add_argument('-mut', action='store_true', help='enable mutation for scwrl')
 parser.add_argument('-exe', action='store', help='scwrl exe path')
-parser.add_argument('-m', action='store', help='mutation file for schrodinger')
 parser.add_argument('-check_cu', action='store_true', help='check charge of Cu')
 parser.add_argument('-cross_link', action='store_true', help='Cross Linking')
 parser.add_argument('-zero_bond', action='store_true', help='Zero Bonding with CU')
 
 args = parser.parse_args()
 
+if args.pdb == None:
+    print('You forgot to provide a pdb folder.')
+
 out_folder_path = os.path.join(os.getcwd(), args.pdb + '/scwrl_out')
 
 if not args.het and args.check_cu and args.zero_bond:
     raise Exception('het atom folder must be given, to enable checking for CU charge and zero order boding with CU.')
-
-if args.pdb is None:
-    print('You forgot to provide a pdb folder.')
 
 elif args.s is None:
     print('You forgot to provide a scwrl text file.')
@@ -51,15 +49,8 @@ elif args.het and args.mut:
                 het_atm_folder=args.het, seq_folder='seq_f',
                 out_folder=out_folder_path, scwrl_exe=args.exe)
 
-if args.m:
-    sch_routine(pdb_path=out_folder_path, mutation_file=args.m, is_cross_link=args.cross_link,
+sch_routine(pdb_path=out_folder_path, scwrl_file=args.s, is_cross_link=args.cross_link,
                 is_zero_order_bonding=args.zero_bond, is_check_cu_charge=args.check_cu,
                 out_dir=os.path.join(os.getcwd(), args.pdb + '/for_sch_opt')
-                )
-
-if args.m is None:
-    sch_routine(pdb_path=out_folder_path, mutation_file=args.m, is_cross_link=args.cross_link,
-                is_zero_order_bonding=args.zero_bond, is_check_cu_charge=args.check_cu,
-                out_dir=os.path.join(os.getcwd(), args.pdb + '/scwrl_out')
                 )
 

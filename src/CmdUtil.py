@@ -22,24 +22,24 @@ def run_scwrl(
 
     # no mutation, just add het atoms
     if seq_file_path is None and hetatm_pdb_path:
-        bash_cmd = " ".join([scwrl_exe_path, '-i', full_pdb_path,
+        bash_cmd = " ".join([scwrl_exe_path, '-i', full_pdb_path, '-h',
                              '-f', hetatm_pdb_path, '-o', out_pdb, '> log.txt'])
         is_add_het = True
 
     # mutation and add het atoms
     elif seq_file_path and hetatm_pdb_path:
-        bash_cmd = " ".join([scwrl_exe_path, '-i', full_pdb_path, '-s', seq_file_path,
+        bash_cmd = " ".join([scwrl_exe_path, '-i', full_pdb_path, '-h', '-s', seq_file_path,
                              '-f', hetatm_pdb_path, '-o', out_pdb, '> log.txt'])
         is_add_het = True
 
     # mutation and don't add het atoms
     elif seq_file_path and hetatm_pdb_path is None:
-        bash_cmd = " ".join([scwrl_exe_path, '-i', full_pdb_path, '-s', seq_file_path,
+        bash_cmd = " ".join([scwrl_exe_path, '-i', full_pdb_path, '-h', '-s', seq_file_path,
                              '-o', out_pdb, '> log.txt'])
 
     # plain side-chain modelling
     else:
-        bash_cmd = " ".join([scwrl_exe_path, '-i', full_pdb_path,
+        bash_cmd = " ".join([scwrl_exe_path, '-i', full_pdb_path, '-h',
                              '-o', out_pdb, '> log.txt'])
 
     os.system(bash_cmd)
@@ -131,18 +131,18 @@ def batch_scwrl(scwrl_file: str, pdb_folder: str,
     with open(scwrl_file, 'r') as file:
         lines = file.readlines()
         row_index = 1
-
+        print(lines)
         with MoonSpinner('SCWRL in progress') as bar:
             for line in lines:
 
-                if line.count(',') != 2:
+                if line.count(',') < 2 or line.count(',') > 3 :
                     row_index += 1
                     #bar.next()
                     continue
 
                 # correct it, if users give wrong file ordering
                 pdb_file, het_file, seq_file = file_ordering(line.strip().split(','))
-                #print(f'{pdb_file} {het_file} {seq_file}')
+                print(f'{pdb_file} {het_file} {seq_file}')
                 if pdb_file == 0 or (het_file != 0 and het_atm_folder is None) or (seq_file != 0 and seq_folder is None):
                     row_index += 1
                     #bar.next()
