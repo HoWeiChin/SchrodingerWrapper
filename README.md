@@ -13,7 +13,6 @@
   3. -het : a **path** to a folder which contains het-atom txt files for scwrl
   4. -mut : invoke this flag **only** if you wan scwrl to perform mutation 
   5. -exe : **path** to a scwrl exe file 
-  6. -m   : mutation file for schrodinger, must be used in conjuction with -het flag. 
   7. -check_cu : to check the charge of Cu
   8. -cross_link : to enable cross linkling
   9. -zero_bond : zero bonding with Cu
@@ -35,9 +34,10 @@ The scwrl file tells the application how many pdb files will need to be processe
 Note that, we only support point amino acid mutation currently.
 
 ### The format
-Each row of the scwrl file looks like: pdb_file, het_atom_file, mutation.
-Example: `1og2A.pdb,het_atm.txt,31:E:A`
+Each row of the scwrl file looks like: pdb_file, het_atom_file, scwrl related mutation, <schrodinger related mutation>
+Example: `1og2A.pdb,het_atm.txt,31:E:A,272|OH|F|F`
 \
+`272|OH|F|F`, means OH group of the 272 residue will be changed to a Fluorine atom of Fluorine element type.
 \
 Subsequently, mutation has the following format: residue-number:mutant amino acid:polypeptide chain
 Example: `31:E:A`, this means that the 31st residue of the A polypeptide chain of a protein will be turned into a Glutamate.
@@ -58,22 +58,13 @@ Hence, if you would like to omit an optional input, do provide the inputs as fol
 Note that, the order of <pdb_file>, <het_atom_file>, <mutation> is inconsequential as the applcation has a logic to sort them. 
 Also, note that if you supply a het_atom file without supplying the het_atm flag, the application will skip over a pdb file associated with a het_atom file.
  
-## The mutation file (for -m flag)
-### The purpose of mutation file
-Each row depicts a change of an atom of an amino acid residue to a new atom.
-
-### The format
-Eg: `154,O,F,F|`, where 154 is the amino acid residue number, O is the oxygen atom of residue 154 which will be changed to F, a fluorine atom and the 2nd F is the element type.
-
-Note that each row of the mutation file corresponds to a sorted order of pdb files in the pdb folder.
-Also note that, `|` is meant to separate multiple mutations of a pdb file, but due to a bug, only one mutation is allowed.
 
 ## Example on using Scwrl without Schrodinger routine:
-### 1. Scwrl with mutation
+### 1. Scwrl with scwrl mutation
 `python3 main.py -s scwrl.txt -pdb pdb_f -exe /home/howc/Desktop/SWRL/Scwrl4 -mut`
-### 2. Scwrl without mutation
+### 2. Scwrl without scwrl mutation
 `python3 main.py -s scwrl.txt -pdb pdb_f -exe /home/howc/Desktop/SWRL/Scwrl4`
 ### 3. Scwrl and Schrodinger
-` python3 main.py -s scwrl.txt -pdb pdb_f -exe /home/howc/Desktop/SWRL/Scwrl4 -mut -m 2_mutations.txt -het het_atm`
+` python3 main.py -s scwrl.txt -pdb pdb_f -exe /home/howc/Desktop/SWRL/Scwrl4 -mut -het het_atm`
 ## Future
-Set up CI/CD, code refactoring. More unit-testing, current test cases are minimal. Resolve bug related to mutation file.. 
+Set up CI/CD, code refactoring. More unit-testing, current test cases are minimal. 
