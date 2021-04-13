@@ -2,4 +2,5 @@
 1goh.pdb,,280:E:A
 1ubq.pdb,,
 1og2.pdb,,het_atm2.txt
-1gog.pdb,330:M:A,het_atm.txt,272|OH|F|F
+1gog.pd
+b,330:M:A,het_atm.txt,272|OH|F|F
