@@ -204,6 +204,21 @@ def batch_scwrl(scwrl_file: str, pdb_folder: str,
                 row_index += 1
                 #bar.next()
 
+def sdf_to_pdb(sdf_in):
+    if type(sdf_in) != str:
+        raise TypeError(f'sdf file: {sdf_in} is not of type string')
+
+    if type(sdf_in) == type(None):
+        raise TypeError(f'sdf file: {sdf_in} is of type None.')
+
+    if '.sdf' in sdf_in:
+        pdb_out = sdf_in.split('.')[0] + '.pdb'
+
+    elif '.sdf' not in sdf_in:
+        pdb_out = sdf_in + '.pdb'
+
+    sdf_to_pdb_cmd = " ".join(['babel', sdf_in, pdb_out])
+    os.system(sdf_to_pdb_cmd)
 
 if __name__ == '__main__':
     batch_scwrl(scwrl_file='scwrl.txt', pdb_folder='pdb_folder',
