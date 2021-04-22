@@ -41,5 +41,22 @@ def get_sdf_from_pubchem(c_id, dir, file_name):
     with open(file, 'wb') as out_sdf_file:
         out_sdf_file.write(result.content)
 
+    search_again = False
+    with open(file, 'r') as sdf_file:
+        lines = sdf_file.readlines()
 
+        for line in lines:
+            if 'Status: 404' in line:
+                search_again = True
 
+    if search_again:
+        url = f'https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/CID/{c_id}/record/SDF/?record_type=2d'
+        result = r.get(url)
+        file = os.path.join(dir, file_name)
+
+        # file must have sdf extension
+        with open(file, 'wb') as out_sdf_file:
+            out_sdf_file.write(result.content)
+
+if __name__ == '__main__':
+    get_sdf_from_pubchem(c_id=312183, dir='/home/howc/PycharmProjects/pythonProject2/src', file_name='1.sdf')

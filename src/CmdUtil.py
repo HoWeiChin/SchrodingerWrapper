@@ -7,6 +7,7 @@ MGL_PY = '/home/howc/Downloads/mgltools_x86_64Linux2_1.5.6/bin/python'
 MGL_PRO_PREP = '/home/howc/Downloads/mgltools_x86_64Linux2_1.5.6/MGLToolsPckgs/AutoDockTools/Utilities24/prepare_receptor4.py'
 MGL_LIG_PREP = '/home/howc/Downloads/mgltools_x86_64Linux2_1.5.6/MGLToolsPckgs/AutoDockTools/Utilities24/prepare_ligand4.py'
 PRANK = str(Path.cwd().parent / 'p2rank_2.2/prank')
+VINA = str(Path.cwd().parent / 'vina/vina')
 
 def run_scwrl(
         full_pdb_path,
@@ -230,6 +231,7 @@ def sdf_to_pdb(sdf_in):
 
     sdf_to_pdb_cmd = " ".join(['babel', sdf_in, pdb_out])
     os.system(sdf_to_pdb_cmd)
+    return pdb_out
 
 def protein_pdb_to_pdbqt(pdb_f, out_dir):
     """
@@ -241,6 +243,7 @@ def protein_pdb_to_pdbqt(pdb_f, out_dir):
     out_file = os.path.join(out_dir, pdb_f.split('.')[0] + '.pdbqt')
     cmd = " ".join([MGL_PY, MGL_PRO_PREP, '-r', pdb_f, '-o', out_file])
     os.system(cmd)
+    return out_file
 
 def ligand_pdb_to_pdbqt(pdb_f, out_dir):
     """
@@ -252,6 +255,7 @@ def ligand_pdb_to_pdbqt(pdb_f, out_dir):
     out_file = os.path.join(out_dir, pdb_f.split('.')[0] + '.pdbqt')
     cmd = " ".join([MGL_PY, MGL_LIG_PREP, '-l', pdb_f, '-o', out_file])
     os.system(cmd)
+    return out_file
 
 def pred_binding_site(pdb_f):
     """
@@ -261,6 +265,12 @@ def pred_binding_site(pdb_f):
     """
     cmd = " ".join([PRANK, 'predict', '-f', pdb_f, '-o', 'predicted_binding_sites'])
     os.system(cmd)
+
+def docking(ligand_pdbqt, config_txt):
+    out = config_txt.split('.')[0].split('/')[-1] + '.pdbqt'
+    cmd = " ".join([VINA, '--config', config_txt, '--ligand', ligand_pdbqt, '--out', out])
+    os.system(cmd)
+
 if __name__ == '__main__':
     """
         batch_scwrl(scwrl_file='scwrl.txt', pdb_folder='pdb_folder',
@@ -269,8 +279,9 @@ if __name__ == '__main__':
     """
     #sdf_to_pdb('1.sdf')
     #ligand_pdb_to_pdbqt('1.pdb', os.getcwd())
-    pred_binding_site('pdb_f/1gog.pdb')
-
+    #pred_binding_site('pdb_f/1gog.pdb')
+    #protein_pdb_to_pdbqt('1gog.pdb', os.getcwd())
+    docking('1.pdbqt', '/home/howc/PycharmProjects/pythonProject2/src/docking_out/1gog_1_dock.txt')
 
 """
 

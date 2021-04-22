@@ -1,10 +1,17 @@
 import pandas as pd
 import os
-
+from MaeToPDB import *
+from MaeFile import *
+from PubChemUtils import *
+from CmdUtil import *
 
 BINDING_COORDS_DIR = 'predicted_binding_sites'
 DOCKING_OUT_DIR = 'docking_out'
+MAE_DIR = os.getcwd()
+MAE_TO_PDB_DIR = os.path.join(os.getcwd(), 'mae_to_pdb')
 BEST_ROW_INDEX = 0 # get first row of the csv file
+DB_PATH = os.path.join(os.getcwd(), 'test_db/test_db.csv')
+LIG_DIR = os.path.join(os.getcwd(), 'Ligands')
 X_COORD_COL = 6
 Y_COORD_COL = 7
 Z_COORD_COL = 8
@@ -56,31 +63,71 @@ def generate_config(ligand_f, pdb_f):
     receptor_text = get_receptor_text(pdb_f)
 
     ligand = ligand_f.split('.')[0]
-    file_name = f'{pdb_code}_{ligand}_dock.'
+    file_name = f'{pdb_code}_{ligand}_dock.txt'
     out_path = os.path.join(DOCKING_OUT_DIR, file_name)
 
 
     with open(out_path, 'w+') as f:
-        f.write(receptor_text + '/n')
+        f.write(receptor_text + '\n')
 
-        f.write('/n')
+        f.write('\n')
 
-        f.write(x_text + '/n')
-        f.write(y_text + '/n')
-        f.write(z_text + '/n')
+        f.write(x_text + '\n')
+        f.write(y_text + '\n')
+        f.write(z_text + '\n')
 
-        f.write('/n')
+        f.write('\n')
 
-        f.write('size_x = 25' + '/n')
-        f.write('size_y = 25' + '/n')
-        f.write('size_z = 25' + '/n')
+        f.write('size_x = 25' + '\n')
+        f.write('size_y = 25' + '\n')
+        f.write('size_z = 25' + '\n')
 
-        f.write('/n')
+        f.write('\n')
 
         f.write('num_modes = 9')
 
+def convert_mae_to_pdb():
+    files = os.listdir(MAE_DIR)
+    mae_files = list(filter(lambda file: '.mae' in file, files))
+
+    mae_file_objects = []
+    for mae_file in mae_files:
+        mae_file_objects.append(MaeFile(mae_file=mae_file, mae_folder=MAE_DIR))
+
+    for mae_file_obj in mae_file_objects:
+        MaeToPDB(mae_file_obj, MAE_TO_PDB_DIR)
+
+def get_ligand_sdfs():
+    db_df = pd.read_csv(DB_PATH)
+    CID_COL_INDEX = 12
+    cids = db_df.iloc[:, CID_COL_INDEX].unique()
+    for cid in cids:
+        str_cid = str(int(cid))
+        get_sdf_from_pubchem(int(cid), LIG_DIR, str_cid+'.sdf')
+
+def prep_ligands():
+    get_ligand_sdfs()
+    for lig_sdf in os.listdir(LIG_DIR):
+        sdf_path = os.path.join(LIG_DIR, lig_sdf)
+        lig_pdb_out = sdf_to_pdb(sdf_path)
+
+        os.system(f"rm {sdf_path}")
+
+        pdb_path = os.path.join(LIG_DIR, lig_pdb_out)
+        ligand_pdb_to_pdbqt(os.path.join(LIG_DIR, lig_pdb_out), LIG_DIR)
+
+        os.system(f"rm {pdb_path}")
+
+def prep_proteins():
+    for protein_pdb in os.listdir(MAE_TO_PDB_DIR):
+        protein_pdb_path = os.path.join(MAE_TO_PDB_DIR, protein_pdb)
+        protein_pdb_to_pdbqt(protein_pdb_path, MAE_TO_PDB_DIR)
+        os.system(f"rm {protein_pdb_path}")
 
 if __name__ == '__main__':
-    print(get_3d_coords('1gog'))
-    print(get_receptor_text('1gog.pdb'))
-    generate_config('1.pdbqt', '1gog.pdbqt')
+    # print(get_3d_coords('1gog'))
+    #print(get_receptor_text('1gog.pdb'))
+    #generate_config('1.pdbqt', '1gog.pdbqt')
+    #convert_mae_to_pdb()
+    #get_ligand_sdfs()
+    prep_ligands()
