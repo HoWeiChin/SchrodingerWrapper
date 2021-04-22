@@ -1,0 +1,2 @@
+Error: Could not find or load main class cz.siret.prank.program.Main
+Caused by: java.lang.ClassNotFoundException: cz.siret.prank.program.Main

@@ -1,6 +1,12 @@
 from progress.spinner import MoonSpinner
 from ScwrlMutant import mutate
+from pathlib import Path
 import os
+
+MGL_PY = '/home/howc/Downloads/mgltools_x86_64Linux2_1.5.6/bin/python'
+MGL_PRO_PREP = '/home/howc/Downloads/mgltools_x86_64Linux2_1.5.6/MGLToolsPckgs/AutoDockTools/Utilities24/prepare_receptor4.py'
+MGL_LIG_PREP = '/home/howc/Downloads/mgltools_x86_64Linux2_1.5.6/MGLToolsPckgs/AutoDockTools/Utilities24/prepare_ligand4.py'
+PRANK = str(Path.cwd().parent / 'p2rank_2.2/prank')
 
 def run_scwrl(
         full_pdb_path,
@@ -205,6 +211,11 @@ def batch_scwrl(scwrl_file: str, pdb_folder: str,
                 #bar.next()
 
 def sdf_to_pdb(sdf_in):
+    """
+
+    :param sdf_in (str): full path to a .sdf file
+    :return:
+    """
     if type(sdf_in) != str:
         raise TypeError(f'sdf file: {sdf_in} is not of type string')
 
@@ -220,10 +231,46 @@ def sdf_to_pdb(sdf_in):
     sdf_to_pdb_cmd = " ".join(['babel', sdf_in, pdb_out])
     os.system(sdf_to_pdb_cmd)
 
+def protein_pdb_to_pdbqt(pdb_f, out_dir):
+    """
+
+    :param pdb_f (str): abs path to a pdb file
+    :param out_dir (str): abs path to a folder which stores pdbqt version of pdb_f
+    :return:
+    """
+    out_file = os.path.join(out_dir, pdb_f.split('.')[0] + '.pdbqt')
+    cmd = " ".join([MGL_PY, MGL_PRO_PREP, '-r', pdb_f, '-o', out_file])
+    os.system(cmd)
+
+def ligand_pdb_to_pdbqt(pdb_f, out_dir):
+    """
+
+    :param pdb_f (str): abs path to a pdb file
+    :param out_dir (str): abs path to a folder which stores pdbqt version of pdb_f
+    :return:
+    """
+    out_file = os.path.join(out_dir, pdb_f.split('.')[0] + '.pdbqt')
+    cmd = " ".join([MGL_PY, MGL_LIG_PREP, '-l', pdb_f, '-o', out_file])
+    os.system(cmd)
+
+def pred_binding_site(pdb_f):
+    """
+
+    :param pdb_f: abs path to pdb
+    :return:
+    """
+    cmd = " ".join([PRANK, 'predict', '-f', pdb_f, '-o', 'predicted_binding_sites'])
+    os.system(cmd)
 if __name__ == '__main__':
-    batch_scwrl(scwrl_file='scwrl.txt', pdb_folder='pdb_folder',
+    """
+        batch_scwrl(scwrl_file='scwrl.txt', pdb_folder='pdb_folder',
                 het_atm_folder='het_atm_folder', seq_folder='seq_folder',
-                out_folder='out_folder', scwrl_exe='/home/howc/Desktop/SWRL/Scwrl4')
+                out_folder='out_folder', scwrl_exe='/home/howc/Desktop/SWRL/Scwrl4') 
+    """
+    #sdf_to_pdb('1.sdf')
+    #ligand_pdb_to_pdbqt('1.pdb', os.getcwd())
+    pred_binding_site('pdb_f/1gog.pdb')
+
 
 """
 
