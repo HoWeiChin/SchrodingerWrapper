@@ -257,15 +257,6 @@ def ligand_pdb_to_pdbqt(pdb_f, out_dir):
     os.system(cmd)
     return out_file
 
-def pred_binding_site(pdb_f):
-    """
-
-    :param pdb_f: abs path to pdb
-    :return:
-    """
-    cmd = " ".join([PRANK, 'predict', '-f', pdb_f, '-o', 'predicted_binding_sites'])
-    os.system(cmd)
-
 def docking(ligand_pdbqt, config_txt):
     out = config_txt.split('.')[0].split('/')[-1] + '.pdbqt'
     cmd = " ".join([VINA, '--config', config_txt, '--ligand', ligand_pdbqt, '--out', out])

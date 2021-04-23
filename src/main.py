@@ -30,7 +30,7 @@ elif args.s is None:
 elif args.exe is None:
     print('You forgot to provide a scwrl exe file.')
 
-elif args.het is None and args.mut is None:
+elif args.het is None and not args.mut:
     batch_scwrl(scwrl_file=args.s, pdb_folder=args.pdb,
                 het_atm_folder=None, seq_folder=None,
                 out_folder=out_folder_path, scwrl_exe=args.exe)
@@ -50,6 +50,7 @@ elif args.het and args.mut:
                 het_atm_folder=args.het, seq_folder='seq_f',
                 out_folder=out_folder_path, scwrl_exe=args.exe)
 
+
 sch_routine(pdb_path=out_folder_path, scwrl_file=args.s, is_cross_link=args.cross_link,
                 is_zero_order_bonding=args.zero_bond, is_check_cu_charge=args.check_cu,
                 out_dir=os.path.join(os.getcwd(), args.pdb + '/for_sch_opt')
@@ -58,3 +59,5 @@ sch_routine(pdb_path=out_folder_path, scwrl_file=args.s, is_cross_link=args.cros
 convert_mae_to_pdb()
 prep_ligands()
 prep_proteins()
+bulk_pred_binding_sites()
+bulk_docking()

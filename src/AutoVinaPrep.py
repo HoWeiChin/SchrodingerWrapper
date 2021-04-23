@@ -58,14 +58,16 @@ def generate_config(ligand_f, pdb_f):
     :param pdb_f:  in .pdbqt format
     :return:
     """
-    pdb_code = pdb_f.split('.')[0]
+
+    pdb_code = pdb_f.split('.')[0].split('/')[-1].split('_')[0]
+
     x_text, y_text, z_text = get_3d_coords(pdb_code)
     receptor_text = get_receptor_text(pdb_f)
 
-    ligand = ligand_f.split('.')[0]
+    ligand = ligand_f.split('.')[0].split('/')[-1]
+    print(f'{pdb_code} {ligand}')
     file_name = f'{pdb_code}_{ligand}_dock.txt'
     out_path = os.path.join(DOCKING_OUT_DIR, file_name)
-
 
     with open(out_path, 'w+') as f:
         f.write(receptor_text + '\n')
@@ -85,6 +87,7 @@ def generate_config(ligand_f, pdb_f):
         f.write('\n')
 
         f.write('num_modes = 9')
+    return out_path
 
 def convert_mae_to_pdb():
     files = os.listdir(MAE_DIR)
@@ -123,6 +126,40 @@ def prep_proteins():
         protein_pdb_path = os.path.join(MAE_TO_PDB_DIR, protein_pdb)
         protein_pdb_to_pdbqt(protein_pdb_path, MAE_TO_PDB_DIR)
         os.system(f"rm {protein_pdb_path}")
+
+def pred_binding_site(pdb_f):
+    """
+
+    :param pdb_f: abs path to pdb
+    :return:
+    """
+    cmd = " ".join([PRANK, 'predict', '-f', pdb_f, '-o', 'predicted_binding_sites'])
+    os.system(cmd)
+
+def bulk_pred_binding_sites():
+    for pdb in os.listdir(MAE_TO_PDB_DIR):
+        abs_pdb_path = os.path.join(MAE_TO_PDB_DIR, pdb)
+        pred_binding_site(abs_pdb_path)
+        pdb_code = pdb.split('.')[0]
+        print(get_3d_coords(pdb_code))
+
+def bulk_docking():
+    db_df = pd.read_csv(DB_PATH)
+    CID_INDEX = 12
+    PDB_CODE_INDEX = 0
+
+    for index, row in db_df.iterrows():
+        pdb_code = row[PDB_CODE_INDEX]
+        ligand_cid = row[CID_INDEX]
+
+        ligand_pdbqt = list(filter(lambda lig_pdbqt: str(int(ligand_cid)) in lig_pdbqt, os.listdir(LIG_DIR)))[0]
+        protein_pdbqt = list(filter(lambda prot_pdbqt: pdb_code in prot_pdbqt, os.listdir(MAE_TO_PDB_DIR)))[0]
+
+        ligand_pdbqt_path = os.path.join(LIG_DIR, ligand_pdbqt)
+        protein_pdbqt_path = os.path.join(MAE_TO_PDB_DIR, protein_pdbqt)
+
+        config_txt_path = generate_config(ligand_pdbqt_path, protein_pdbqt_path)
+        docking(ligand_pdbqt_path, config_txt_path)
 
 if __name__ == '__main__':
     # print(get_3d_coords('1gog'))

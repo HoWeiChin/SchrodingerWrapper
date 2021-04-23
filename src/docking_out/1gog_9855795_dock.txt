@@ -1,0 +1,11 @@
+receptor = /home/howc/PycharmProjects/pythonProject2/src/mae_to_pdb/1gog_1_out.pdbqt
+
+center_x = 34.9678
+center_y = 1.3915
+center_z = -2.0719
+
+size_x = 25
+size_y = 25
+size_z = 25
+
+num_modes = 9
