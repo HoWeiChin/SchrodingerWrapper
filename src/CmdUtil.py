@@ -2,6 +2,7 @@ from progress.spinner import MoonSpinner
 from ScwrlMutant import mutate
 from pathlib import Path
 import os
+import pandas as pd
 
 MGL_PY = '/home/howc/Downloads/mgltools_x86_64Linux2_1.5.6/bin/python'
 MGL_PRO_PREP = '/home/howc/Downloads/mgltools_x86_64Linux2_1.5.6/MGLToolsPckgs/AutoDockTools/Utilities24/prepare_receptor4.py'
@@ -41,6 +42,7 @@ def run_scwrl(
 
     # mutation and don't add het atoms
     elif seq_file_path and hetatm_pdb_path is None:
+        print('scwrl')
         bash_cmd = " ".join([scwrl_exe_path, '-i', full_pdb_path, '-h', '-s', seq_file_path,
                              '-o', out_pdb, '> log.txt'])
 
@@ -48,7 +50,7 @@ def run_scwrl(
     else:
         bash_cmd = " ".join([scwrl_exe_path, '-i', full_pdb_path, '-h',
                              '-o', out_pdb, '> log.txt'])
-
+    print(bash_cmd)
     os.system(bash_cmd)
 
     if is_add_het:
@@ -142,7 +144,7 @@ def batch_scwrl(scwrl_file: str, pdb_folder: str,
         with MoonSpinner('SCWRL in progress') as bar:
             for line in lines:
 
-                if line.count(',') < 2 or line.count(',') > 3 :
+                if line.count(',') != 2:
                     row_index += 1
                     #bar.next()
                     continue
@@ -210,6 +212,90 @@ def batch_scwrl(scwrl_file: str, pdb_folder: str,
 
                 row_index += 1
                 #bar.next()
+
+def get_correct_wt_pdb(mt_code):
+    if 'CYP102A1' in mt_code:
+        return '4KPA.pdb'
+    elif 'CYP3A4' in mt_code:
+        return '4ny4.pdb'
+    elif 'CYP2D6' in mt_code:
+        return '3TBG.pdb'
+
+    return None
+
+def batch_scwrl_v2(db_file: str, pdb_folder: str,
+                het_atm_folder: str, seq_folder: str,
+                out_folder: str, scwrl_exe: str
+                ):
+    """
+
+    :param db_file (str): path of file containing data scrapped from mutein db
+    :param pdb_folder (str): folder containing pdb file(s)
+    :param het_atm_folder (str): folder containing het atm txt file(s)
+    :param seq_folder (str): folder containing seq.txt file(s)
+    :param out_folder (str):
+    :return:
+    """
+    db_file_path = os.getcwd() + '/test_db/' + db_file
+    try:
+
+        file = open(db_file_path, 'r')
+        file.close()
+
+    except FileNotFoundError:
+        print(f'{db_file} not present, pls check.')
+
+    if not os.path.exists(out_folder):
+        os.makedirs(out_folder)
+
+    if het_atm_folder:
+        check_folder(het_atm_folder)
+
+    if seq_folder:
+        if not os.path.exists(seq_folder):
+            os.mkdirs(seq_folder)
+
+    check_folder(pdb_folder)
+
+    pd_db_df = pd.read_csv(db_file_path)
+    cache = set()
+
+    for index, row in pd_db_df.iterrows():
+        mt_code = row['mt_code']
+
+        if mt_code in cache:
+            continue
+
+        elif mt_code not in cache:
+            cache.add(mt_code)
+
+        mt_seq = row['mt_seq']
+        correct_pdb = get_correct_wt_pdb(mt_code)
+
+        if correct_pdb is None:
+            continue
+
+        full_pdb_path = os.path.join(pdb_folder, correct_pdb)
+
+        if seq_folder is not None and het_atm_folder is None:
+            if '/' in mt_code:
+                mt_code = mt_code.replace('/', '_')
+
+            seq_file_name = f'{mt_code}_seq.txt'
+
+            seq_file_path = os.path.join(seq_folder, seq_file_name)
+
+            with open(seq_file_path, 'w+') as seq_f:
+                seq_f.write(mt_seq)
+
+            out_file_path = os.path.join(out_folder, f'{mt_code}.pdb')
+
+            run_scwrl(full_pdb_path=full_pdb_path,
+                      out_pdb=out_file_path,
+                      scwrl_exe_path=scwrl_exe,
+                      seq_file_path=seq_file_path,
+                      hetatm_pdb_path=None
+                    )
 
 def sdf_to_pdb(sdf_in):
     """

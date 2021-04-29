@@ -77,6 +77,43 @@ def mutate(
 
     return result, final_out_path
 
+def get_one_letter_aa_seq(residues):
+    seq = []
+    repeated_res = set()
+    AA = {'Ala': 'A',
+          'Arg': 'R',
+          'Asn': 'N',
+          'Asp': 'D',
+          'Cys': 'C',
+          'Glu': 'E',
+          'Gln': 'Q',
+          'Gly': 'G',
+          'His': 'H',
+          'Hid': 'H',
+          'Ile': 'I',
+          'Leu': 'L',
+          'Lys': 'K',
+          'Met': 'M',
+          'Phe': 'F',
+          'Pro': 'P',
+          'Ser': 'S',
+          'Thr': 'T',
+          'Trp': 'W',
+          'Tyr': 'Y',
+          'Val': 'V'}
+
+    for residue in residues:
+
+        if residue.isStandardResidue():
+
+            three_letter_res = residue.pdbres.capitalize().strip()
+            one_letter_res = AA[three_letter_res]
+
+            seq.append(one_letter_res)
+            repeated_res.add(residue.resnum)
+
+    result = ''.join(seq)
+    return result
 
 if __name__ == "__main__":
     # mutate('1a3n.pdb', 146, 'A', 'E')
@@ -87,7 +124,20 @@ if __name__ == "__main__":
     #result = mutate('1d66.pdb', 1, 'Y', 'A')
     #print(result + '\n')
     #assert result == 'YQACDICRLKKLKCSKEKPKCAKCLKNNWECRYSPKTKRSPLTRAHLTEVESRLERL'
+    pdb = 'pdb_f/4ny4.pdb'
+    #mut_seq = open('seq_f/CYP2D6-F481G_seq.txt', 'r')
 
-    result, _ = mutate('seq_f', '1og2.pdb', 31, 'E', 'A')
-    print(result + '\n')
-    assert result == 'PEGPTPLPVIGNILQIGIKDISKSLTNLSKVYGPVFTLYFGLKPIVVLHGYEAVKEALIDLGEEFSGRGIFPLAERANRGFGIVFSNGKKWKEIRRFSLMTLRNFGMGKRSIEDRVQEEARCLVEELRKTKASPCDPTFILGCAPCNVICSIIFHKRFDYKDQQFLNLMEKLNENIEILSSPWIQVYNNFPALLDYFPGTHNKLLKNVAFMKSYILEKVKEHQESMDMNNPQDFIDCFLMKMEKEKHNQPSEFTIESLENTAVDLFGAGTETTSTTLRYALLLLLKHPEVTAKVQEEIERVIGRNRSPCMQDRSHMPYTDAVVHEVQRYIDLLPTSLPHAVTCDIKFRNYLIPKGTTILISLTSVLHDNKEFPNPEMFDPHHFLDEGGNFKKSKYFMPFSAGKRICVGEALAGMELFLFLTSILQNFNLKSLVDPKNLDTTPVVNGFASVPPFYQLCFIPV'
+    st = structure.StructureReader.read(pdb)
+    chains = st.chain
+    complete_seq = []
+    for chain in chains:
+        one_letter_seq = get_one_letter_aa_seq(chain.residue)
+        print(one_letter_seq)
+        print(len(one_letter_seq))
+
+    print(''.join(complete_seq))
+
+
+
+
+
