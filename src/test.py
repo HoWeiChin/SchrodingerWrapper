@@ -15,7 +15,7 @@ def file_ordering(files):
 
     return result
 
-a = '1gog.pdb,,het_atm.txt,272|OH|F|F'
+a = '1gog.pdb,,het_atm_3a4.txt,272|OH|F|F'
 print(file_ordering(a.strip().split(',')))
 print('#################################')
 a = '1goh.pdb,,'

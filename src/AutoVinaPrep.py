@@ -10,7 +10,7 @@ DOCKING_OUT_DIR = 'docking_out'
 MAE_DIR = os.getcwd()
 MAE_TO_PDB_DIR = os.path.join(os.getcwd(), 'mae_to_pdb')
 BEST_ROW_INDEX = 0 # get first row of the csv file
-DB_PATH = os.path.join(os.getcwd(), 'test_db/test_db.csv')
+DB_PATH = os.path.join(os.getcwd(), 'test_db/test_db_subset_CYP3A4_1tqn.csv')
 LIG_DIR = os.path.join(os.getcwd(), 'Ligands')
 X_COORD_COL = 6
 Y_COORD_COL = 7
@@ -22,8 +22,11 @@ def get_3d_coords(pdb_code):
     :param pdb_code (str): a pdb code, for example: 1gog, without the .pdb extension
     :return: (tuple of str of 3d coords). for example: ('center_x =  2', 'center_y =  6', 'center_z = -7')
     """
-    target_file = list(filter(lambda file: pdb_code in file, os.listdir(BINDING_COORDS_DIR)))
 
+    target_file = list(filter(lambda file: pdb_code in file and 'predictions' in file, os.listdir(BINDING_COORDS_DIR)))
+    print('inside get_3d_coords()')
+    print(f'pdb code: {pdb_code}')
+    print(target_file)
     if len(target_file) == 0:
         raise FileNotFoundError(f'{pdb_code} pdb file not present.')
 
@@ -59,16 +62,17 @@ def generate_config(ligand_f, pdb_f):
     :return:
     """
 
-    pdb_code = pdb_f.split('.')[0].split('/')[-1].split('_')[0]
+    pdb_code = pdb_f.split('/')[-1].replace('.pdbqt', '')
 
     x_text, y_text, z_text = get_3d_coords(pdb_code)
     receptor_text = get_receptor_text(pdb_f)
 
     ligand = ligand_f.split('.')[0].split('/')[-1]
-    print(f'{pdb_code} {ligand}')
+
     file_name = f'{pdb_code}_{ligand}_dock.txt'
     out_path = os.path.join(DOCKING_OUT_DIR, file_name)
-
+    print('inside generate_config()')
+    print(out_path)
     with open(out_path, 'w+') as f:
         f.write(receptor_text + '\n')
 
@@ -102,8 +106,9 @@ def convert_mae_to_pdb():
 
 def get_ligand_sdfs():
     db_df = pd.read_csv(DB_PATH)
-    CID_COL_INDEX = 12
+    CID_COL_INDEX = 13
     cids = db_df.iloc[:, CID_COL_INDEX].unique()
+
     for cid in cids:
         str_cid = str(int(cid))
         get_sdf_from_pubchem(int(cid), LIG_DIR, str_cid+'.sdf')
@@ -121,10 +126,15 @@ def prep_ligands():
 
         os.system(f"rm {pdb_path}")
 
-def prep_proteins():
-    for protein_pdb in os.listdir(MAE_TO_PDB_DIR):
-        protein_pdb_path = os.path.join(MAE_TO_PDB_DIR, protein_pdb)
-        protein_pdb_to_pdbqt(protein_pdb_path, MAE_TO_PDB_DIR)
+def prep_proteins(path):
+    file_dir = MAE_TO_PDB_DIR
+
+    if not path is None:
+        file_dir = path
+
+    for protein_pdb in os.listdir(file_dir):
+        protein_pdb_path = os.path.join(file_dir, protein_pdb)
+        protein_pdb_to_pdbqt(protein_pdb_path, file_dir)
         os.system(f"rm {protein_pdb_path}")
 
 def pred_binding_site(pdb_f):
@@ -136,30 +146,42 @@ def pred_binding_site(pdb_f):
     cmd = " ".join([PRANK, 'predict', '-f', pdb_f, '-o', 'predicted_binding_sites'])
     os.system(cmd)
 
-def bulk_pred_binding_sites():
-    for pdb in os.listdir(MAE_TO_PDB_DIR):
-        abs_pdb_path = os.path.join(MAE_TO_PDB_DIR, pdb)
-        pred_binding_site(abs_pdb_path)
-        pdb_code = pdb.split('.')[0]
-        print(get_3d_coords(pdb_code))
+def bulk_pred_binding_sites(path):
+    file_dir = MAE_TO_PDB_DIR
+    if not path is None:
+        file_dir = path
 
-def bulk_docking():
+    for pdbqt in os.listdir(file_dir):
+        abs_pdb_path = os.path.join(file_dir, pdbqt)
+        pred_binding_site(abs_pdb_path)
+
+
+def bulk_docking(path):
+    file_dir = MAE_TO_PDB_DIR
+
+    if not path is None:
+        file_dir = path
+
     db_df = pd.read_csv(DB_PATH)
-    CID_INDEX = 12
-    PDB_CODE_INDEX = 0
+    CID_INDEX = 13
+    PDB_CODE_INDEX = 1
 
     for index, row in db_df.iterrows():
         pdb_code = row[PDB_CODE_INDEX]
+
         ligand_cid = row[CID_INDEX]
+        print(f'pdb code: {pdb_code} ligand cid: {ligand_cid} in docking')
+
 
         ligand_pdbqt = list(filter(lambda lig_pdbqt: str(int(ligand_cid)) in lig_pdbqt, os.listdir(LIG_DIR)))[0]
-        protein_pdbqt = list(filter(lambda prot_pdbqt: pdb_code in prot_pdbqt, os.listdir(MAE_TO_PDB_DIR)))[0]
+        protein_pdbqt = list(filter(lambda prot_pdbqt: pdb_code in prot_pdbqt, os.listdir(file_dir)))[0]
 
         ligand_pdbqt_path = os.path.join(LIG_DIR, ligand_pdbqt)
-        protein_pdbqt_path = os.path.join(MAE_TO_PDB_DIR, protein_pdbqt)
+        protein_pdbqt_path = os.path.join(file_dir, protein_pdbqt)
 
         config_txt_path = generate_config(ligand_pdbqt_path, protein_pdbqt_path)
-        docking(ligand_pdbqt_path, config_txt_path)
+        print(config_txt_path)
+        docking(ligand_pdbqt_path, config_txt_path, protein_pdbqt_path)
 
 if __name__ == '__main__':
     # print(get_3d_coords('1gog'))
@@ -167,4 +189,6 @@ if __name__ == '__main__':
     #generate_config('1.pdbqt', '1gog.pdbqt')
     #convert_mae_to_pdb()
     #get_ligand_sdfs()
-    prep_ligands()
+    #prep_ligands()
+    out_folder_path = os.path.join(os.getcwd(), 'pdb_f/scwrl_out')
+    bulk_docking(path=out_folder_path)

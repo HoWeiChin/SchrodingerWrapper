@@ -2,7 +2,7 @@ import argparse
 import os
 from CmdUtil import batch_scwrl_v2
 from automate_schrodinger import sch_routine
-#from AutoVinaPrep import *
+from AutoVinaPrep import *
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-db', action='store', help='db file path')
@@ -55,10 +55,10 @@ sch_routine(pdb_path=out_folder_path, scwrl_file=args.s, is_cross_link=args.cros
                 is_zero_order_bonding=args.zero_bond, is_check_cu_charge=args.check_cu,
                 out_dir=os.path.join(os.getcwd(), args.pdb + '/for_sch_opt')
                 )
-
-convert_mae_to_pdb()
-prep_ligands()
-prep_proteins()
-bulk_pred_binding_sites()
-bulk_docking()
 """
+
+#convert_mae_to_pdb()
+prep_ligands()
+prep_proteins(path=out_folder_path)
+bulk_pred_binding_sites(path=out_folder_path)
+bulk_docking(path=out_folder_path)

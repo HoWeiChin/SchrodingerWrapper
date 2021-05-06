@@ -1,0 +1,67 @@
+[INFO] ConsoleWriter - predicting pockets for proteins from dataset [CYP3A4.7.pdbqt]
+[INFO] PredictRoutine - outdir: predicted_binding_sites
+[INFO] Dataset - processing dataset [CYP3A4.7.pdbqt] using 0 threads
+[INFO] Dataset - 
+------------------------------------------------------------------------------------------------------------------------
+processing [CYP3A4.7.pdbqt] (1/1)
+------------------------------------------------------------------------------------------------------------------------
+
+[INFO] ConsoleWriter - processing [CYP3A4.7.pdbqt] (1/1)
+[INFO] Protein - loading protein [/home/howc/PycharmProjects/pythonProject2/src/pdb_f/scwrl_out/CYP3A4.7.pdbqt]
+[INFO] PdbUtils - loading file [/home/howc/PycharmProjects/pythonProject2/src/pdb_f/scwrl_out/CYP3A4.7.pdbqt]
+[INFO] Struct - groups in chain A: 469
+[INFO] Struct - groups in chain A: 469
+[INFO] Struct - 468 groups in chain A
+[INFO] Protein - structure atoms: 3813
+[INFO] Protein - protein   atoms: 3709
+[INFO] Protein - ignoring ligands
+[INFO] Protein - SAS points: 6790
+[INFO] Protein - exposed protein atoms: 2478 of 3709
+[INFO] InstancePredictor - Creating WekaInstancePredictor
+[INFO] PrankFeatureExtractor - P2R protein:3709  exposedAtoms:2478  deepLayer:3709 sasPoints:6790
+[INFO] SLinkClusterer - clustering [537] elements
+[INFO] SLinkClusterer - clusters: [id:0( 1 ), id:13( 3 ), id:15( 4 ), id:29( 11 ), id:32( 1 ), id:75( 1 ), id:106( 6 ), id:107( 1 ), id:119( 2 ), id:125( 1 ), id:126( 3 ), id:127( 1 ), id:128( 2 ), id:208( 7 ), id:212( 4 ), id:224( 1 ), id:225( 1 ), id:226( 3 ), id:230( 1 ), id:241( 1 ), id:245( 4 ), id:248( 1 ), id:252( 10 ), id:258( 9 ), id:259( 1 ), id:260( 3 ), id:261( 3 ), id:262( 21 ), id:263( 1 ), id:276( 14 ), id:302( 24 ), id:333( 26 ), id:337( 2 ), id:341( 3 ), id:343( 1 ), id:347( 3 ), id:387( 232 ), id:397( 2 ), id:398( 1 ), id:399( 3 ), id:404( 4 ), id:405( 1 ), id:406( 1 ), id:410( 3 ), id:411( 1 ), id:417( 8 ), id:418( 6 ), id:420( 1 ), id:422( 41 ), id:425( 3 ), id:426( 1 ), id:448( 1 ), id:456( 7 ), id:511( 8 ), id:521( 1 ), id:527( 10 ), id:536( 21 )]
+[INFO] SLinkClusterer - clusters together: 537 / 537
+[INFO] PocketPredictor - PREDICTING POCKETS.... ====================================
+[INFO] PocketPredictor - SAS POINTS: 6790
+[INFO] PocketPredictor - LIGANDABLE POINTS: 537
+[INFO] PocketPredictor - CLUSTERS: 57
+[INFO] PocketPredictor - FILTERED CLUSTERS: 31
+[INFO] PocketPredictor - pocket 1 -  surf_atoms: 168   points: 232   score:   89.9
+[INFO] PocketPredictor - pocket 2 -  surf_atoms:  44   points:  41   score:   15.0
+[INFO] PocketPredictor - pocket 3 -  surf_atoms:  33   points:  26   score:    8.3
+[INFO] PocketPredictor - pocket 4 -  surf_atoms:  32   points:  24   score:    7.2
+[INFO] PocketPredictor - pocket 5 -  surf_atoms:  26   points:  21   score:    6.6
+[INFO] PocketPredictor - pocket 6 -  surf_atoms:  14   points:  14   score:    6.2
+[INFO] PocketPredictor - pocket 7 -  surf_atoms:  26   points:  21   score:    5.9
+[INFO] PocketPredictor - pocket 8 -  surf_atoms:  14   points:  10   score:    3.7
+[INFO] PocketPredictor - pocket 9 -  surf_atoms:  23   points:   6   score:    3.7
+[INFO] PocketPredictor - pocket10 -  surf_atoms:  19   points:  11   score:    3.6
+[INFO] PocketPredictor - pocket11 -  surf_atoms:  20   points:  10   score:    3.4
+[INFO] PocketPredictor - pocket12 -  surf_atoms:  18   points:   7   score:    3.0
+[INFO] PocketPredictor - pocket13 -  surf_atoms:  17   points:   7   score:    3.0
+[INFO] PocketPredictor - pocket14 -  surf_atoms:  22   points:   9   score:    2.8
+[INFO] PocketPredictor - pocket15 -  surf_atoms:  33   points:   8   score:    2.7
+[INFO] PocketPredictor - pocket16 -  surf_atoms:  14   points:   4   score:    2.4
+[INFO] PocketPredictor - pocket17 -  surf_atoms:  17   points:   4   score:    2.2
+[INFO] PocketPredictor - pocket18 -  surf_atoms:  13   points:   8   score:    2.0
+[INFO] PocketPredictor - pocket19 -  surf_atoms:  15   points:   3   score:    1.8
+[INFO] PocketPredictor - pocket20 -  surf_atoms:  19   points:   3   score:    1.8
+[INFO] PocketPredictor - pocket21 -  surf_atoms:  13   points:   3   score:    1.8
+[INFO] PocketPredictor - pocket22 -  surf_atoms:  12   points:   6   score:    1.8
+[INFO] PocketPredictor - pocket23 -  surf_atoms:  19   points:   4   score:    1.7
+[INFO] PocketPredictor - pocket24 -  surf_atoms:  12   points:   4   score:    1.4
+[INFO] PocketPredictor - pocket25 -  surf_atoms:  10   points:   3   score:    1.4
+[INFO] PocketPredictor - pocket26 -  surf_atoms:  10   points:   3   score:    1.3
+[INFO] PocketPredictor - pocket27 -  surf_atoms:  11   points:   3   score:    1.2
+[INFO] PocketPredictor - pocket28 -  surf_atoms:  12   points:   3   score:    1.1
+[INFO] PocketPredictor - pocket29 -  surf_atoms:   6   points:   3   score:    1.0
+[INFO] PocketPredictor - pocket30 -  surf_atoms:   4   points:   3   score:    0.7
+[INFO] PocketPredictor - pocket31 -  surf_atoms:   7   points:   3   score:    0.7
+[INFO] OldPymolRenderer - copying [/home/howc/PycharmProjects/pythonProject2/src/pdb_f/scwrl_out/CYP3A4.7.pdbqt] to [predicted_binding_sites/visualizations/data/CYP3A4.7.pdbqt]
+[INFO] ConsoleWriter - predicting pockets finished in 0 hours 0 minutes 5.401 seconds
+[INFO] ConsoleWriter - results saved to directory [/home/howc/PycharmProjects/pythonProject2/src/predicted_binding_sites]
+[INFO] ConsoleWriter - 
+[INFO] ConsoleWriter - ----------------------------------------------------------------------------------------------
+[INFO] ConsoleWriter -  finished successfully in 0 hours 0 minutes 6.762 seconds
+[INFO] ConsoleWriter - ----------------------------------------------------------------------------------------------

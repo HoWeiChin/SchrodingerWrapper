@@ -39,7 +39,7 @@ def run_scwrl(
         bash_cmd = " ".join([scwrl_exe_path, '-i', full_pdb_path, '-h', '-s', seq_file_path,
                              '-f', hetatm_pdb_path, '-o', out_pdb, '> log.txt'])
         is_add_het = True
-
+        print('adding het atm')
     # mutation and don't add het atoms
     elif seq_file_path and hetatm_pdb_path is None:
         print('scwrl')
@@ -77,11 +77,9 @@ def run_prepwizard(prepwiz_exe_path, mae_in, mae_out):
 
     os.system(bash_cmd)
 
-
 def check_folder(folder_path: str):
     if not os.path.exists(folder_path):
         raise Exception(f'{folder_path} is absent, pls create it first.')
-
 
 def file_ordering(files):
     # files is of type list
@@ -106,7 +104,7 @@ def batch_scwrl(scwrl_file: str, pdb_folder: str,
                 ):
     """
 
-    :param scwrl_file (str): file containing, pdb file, het_atm.txt (to store scwrl output)
+    :param scwrl_file (str): file containing, pdb file, het_atm_3a4.txt (to store scwrl output)
     :param pdb_folder (str): folder containing pdb file(s)
     :param het_atm_folder (str): folder containing het atm txt file(s)
     :param seq_folder (str): folder containing seq.txt file(s)
@@ -217,9 +215,21 @@ def get_correct_wt_pdb(mt_code):
     if 'CYP102A1' in mt_code:
         return '4KPA.pdb'
     elif 'CYP3A4' in mt_code:
-        return '4ny4.pdb'
+        return '1tqn.pdb'
     elif 'CYP2D6' in mt_code:
         return '3TBG.pdb'
+
+    return None
+
+def get_correct_het_atm(mt_code):
+    if 'CYP102A1' in mt_code:
+        return 'het_atm_102a1.txt'
+
+    elif 'CYP3A4' in mt_code:
+        return 'het_atm_3a4.txt'
+
+    elif 'CYP2D6' in mt_code:
+        return 'het_atm_2d6.txt'
 
     return None
 
@@ -296,6 +306,25 @@ def batch_scwrl_v2(db_file: str, pdb_folder: str,
                       seq_file_path=seq_file_path,
                       hetatm_pdb_path=None
                     )
+        if seq_folder is not None and not het_atm_folder is None:
+            if '/' in mt_code:
+                mt_code = mt_code.replace('/', '_')
+
+            seq_file_name = f'{mt_code}_seq.txt'
+
+            seq_file_path = os.path.join(seq_folder, seq_file_name)
+
+            with open(seq_file_path, 'w+') as seq_f:
+                seq_f.write(mt_seq)
+
+            out_file_path = os.path.join(out_folder, f'{mt_code}.pdb')
+            het_atm_file = get_correct_het_atm(mt_code)
+            run_scwrl(full_pdb_path=full_pdb_path,
+                      out_pdb=out_file_path,
+                      scwrl_exe_path=scwrl_exe,
+                      seq_file_path=seq_file_path,
+                      hetatm_pdb_path='het_atm/' + het_atm_file
+                    )
 
 def sdf_to_pdb(sdf_in):
     """
@@ -326,7 +355,7 @@ def protein_pdb_to_pdbqt(pdb_f, out_dir):
     :param out_dir (str): abs path to a folder which stores pdbqt version of pdb_f
     :return:
     """
-    out_file = os.path.join(out_dir, pdb_f.split('.')[0] + '.pdbqt')
+    out_file = os.path.join(out_dir, pdb_f.replace('.pdb', '.pdbqt'))
     cmd = " ".join([MGL_PY, MGL_PRO_PREP, '-r', pdb_f, '-o', out_file])
     os.system(cmd)
     return out_file
@@ -343,8 +372,11 @@ def ligand_pdb_to_pdbqt(pdb_f, out_dir):
     os.system(cmd)
     return out_file
 
-def docking(ligand_pdbqt, config_txt):
-    out = config_txt.split('.')[0].split('/')[-1] + '.pdbqt'
+def docking(ligand_pdbqt, config_txt, pdbqt):
+    print('docking....')
+    pdbqt = pdbqt.split('/')[-1]
+    out = os.path.join(os.getcwd()+'/docking_result',pdbqt.replace('.pdbqt', '') + '_docking_result.pdbqt')
+    print(f' out is {out}')
     cmd = " ".join([VINA, '--config', config_txt, '--ligand', ligand_pdbqt, '--out', out])
     os.system(cmd)
 

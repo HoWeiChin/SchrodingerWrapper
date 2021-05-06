@@ -14,7 +14,6 @@ class Process:
         :param scwrl_file: full mutation file path with the following file format: 272,OH,F,F|272,OH,F,F
         where 272,OH,F,F means to induce a change of OH atom to F atom for residue 272.
         When there is more than 1 mutation, we delimit the mutations with |.
-
         :param out_dir: abs path to folder to store mutated pdb files.
         """
         self.__pdb_folder = pdb_folder
