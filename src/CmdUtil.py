@@ -1,6 +1,7 @@
 from progress.spinner import MoonSpinner
 from ScwrlMutant import mutate
 import os
+from Process import Process
 
 def run_scwrl(
         full_pdb_path,
@@ -41,7 +42,7 @@ def run_scwrl(
     else:
         bash_cmd = " ".join([scwrl_exe_path, '-i', full_pdb_path, '-h',
                              '-o', out_pdb, '> log.txt'])
-
+    print(f'cmd in run_scwrl() {bash_cmd}')
     os.system(bash_cmd)
 
     if is_add_het:
@@ -131,7 +132,7 @@ def batch_scwrl(scwrl_file: str, pdb_folder: str,
     with open(scwrl_file, 'r') as file:
         lines = file.readlines()
         row_index = 1
-        print(lines)
+
         with MoonSpinner('SCWRL in progress') as bar:
             for line in lines:
 
@@ -148,12 +149,11 @@ def batch_scwrl(scwrl_file: str, pdb_folder: str,
                     #bar.next()
                     continue
 
-                print(f'Processing {pdb_file} with scwrl')
                 full_pdb_path = os.path.join(pdb_folder, pdb_file)
+
                 pdb_name = pdb_file.split('.')[0]
                 out_file = f'{pdb_name}_{row_index}_out.pdb'
                 out_file = os.path.join(out_folder, out_file)
-
 
                 if het_file == 0:
 

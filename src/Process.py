@@ -36,7 +36,6 @@ class Process:
         if not os.path.exists(self.__scwrl_file):
             raise OSError(f'File {self.__scwrl_file} is not found.')
 
-
         with open(self.__scwrl_file) as file:
             mutations = file.readlines()
 
@@ -45,7 +44,8 @@ class Process:
             for mut_line in mutations:
                 pdb_file_name = mut_line.split(',')[0].split('.')[0] + f'_{count}_out.pdb'
 
-                if pdb_file_name not in os.listdir(self.__pdb_folder):
+
+                if not pdb_file_name in os.listdir(self.__pdb_folder):
                     count += 1
                     continue
 
@@ -63,12 +63,13 @@ class Process:
 
                 for mutation in curr_mutations:
                     if mutation != '':
-                        print(mutation.split('|'))
                         residue_num, old_atm, new_atm, new_ele = mutation.split('|')
                         atms_to_chg.append(AtomToChange(old_atom=old_atm,
                                                         res_number=residue_num,
                                                         new_atom=new_atm, new_atm_ele=new_ele)
                                            )
+
+                print(f'{pdb_file_name} {curr_mutations}')
                 curr_pdb = PDBFile(pdb_folder=self.__pdb_folder, pdb_file=pdb_file_name)
                 pdb_mutator = PDBMut(curr_pdb, atms_to_chg)
                 mutated_pdb_content = pdb_mutator.mutate_pdb()

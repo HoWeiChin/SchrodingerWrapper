@@ -43,12 +43,14 @@ class PDBMut:
         atm_to_be_replaced_index = 2
         lines = open(abs_pdb_file_path, 'r').readlines()
 
+        print(f'pdb_file: {abs_pdb_file_path}')
         for atm_to_chg in self.__mutations:
             atm_to_be_replaced = atm_to_chg.atom
             res_num = atm_to_chg.res_num  # str
             new_atm = atm_to_chg.new_atm  # str
             new_ele = atm_to_chg.new_ele
             count = 0
+            print(f'atm to change:{atm_to_be_replaced} residue num:{res_num} new atom:{new_atm} new element:{new_ele}')
 
             for line in lines:
                 count += 1
@@ -62,15 +64,14 @@ class PDBMut:
                 curr_atm_to_be_changed = line_tokens[atm_to_be_replaced_index]  # a str
 
                 if curr_residue_num == res_num and atm_to_be_replaced == curr_atm_to_be_changed:
+                    print(f'old line: {line}')
                     new_line = self.mutate_line(line, line_tokens, atm_to_be_replaced,
                                                 new_atm, new_ele
                                                 )
-                    print(new_line)
                     new_pdb_content = new_pdb_content + new_line
 
                 elif curr_residue_num != res_num or atm_to_be_replaced != curr_atm_to_be_changed:
                     new_pdb_content = new_pdb_content + line
-
 
         return new_pdb_content
 
@@ -86,5 +87,5 @@ class PDBMut:
 
         pdb_file = self.__pdb_f.file
 
-        with open(os.path.join(out_dir, 'modified_' + pdb_file), "w+") as output:
+        with open(os.path.join(out_dir, pdb_file), "w+") as output:
             output.write(new_content)

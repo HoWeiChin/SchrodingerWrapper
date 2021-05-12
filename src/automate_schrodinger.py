@@ -101,7 +101,7 @@ def bonding(struc, center_atm, partners):
         bond_order = partners[partner_atm]
         struc.addBond(center_atm.index, partner_atm.index, bond_order)
 
-def sch_routine(pdb_path, scwrl_file, is_cross_link, is_zero_order_bonding, is_check_cu_charge, out_dir):
+def sch_routine(is_cross_link, is_zero_order_bonding, is_check_cu_charge, out_dir):
     """
 
     :param pdb_path: path to folder containing pdb files (usually after scwrl has been applied)
@@ -112,8 +112,8 @@ def sch_routine(pdb_path, scwrl_file, is_cross_link, is_zero_order_bonding, is_c
     :return:
     """
 
-    p = Process(pdb_path, scwrl_file, out_dir)
-    p.process()
+    #
+    #p.process()
 
     for mutant in os.listdir(out_dir):
         print(f'Processing pdb {mutant}')

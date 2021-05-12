@@ -2,6 +2,7 @@ import argparse
 import os
 from CmdUtil import batch_scwrl
 from automate_schrodinger import sch_routine
+from Process import Process
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-s', action='store', help='scwrl file path')
@@ -49,8 +50,10 @@ elif args.het and args.mut:
                 het_atm_folder=args.het, seq_folder='seq_f',
                 out_folder=out_folder_path, scwrl_exe=args.exe)
 
-sch_routine(pdb_path=out_folder_path, scwrl_file=args.s, is_cross_link=args.cross_link,
+p = Process(out_folder_path, args.s, out_dir=out_folder_path)
+p.process()
+
+sch_routine(is_cross_link=args.cross_link,
                 is_zero_order_bonding=args.zero_bond, is_check_cu_charge=args.check_cu,
-                out_dir=os.path.join(os.getcwd(), args.pdb + '/for_sch_opt')
-                )
+                out_dir=out_folder_path)
 
