@@ -1,1 +1,1 @@
-2EIE.pdb,,het_atm_2EIE.txt,272|OH|F|F
+pdb:2EIE.pdb,fix:fix.txt,mut:mut.txt,het:het_atm_2EIE.txt,272|OH|F|F
