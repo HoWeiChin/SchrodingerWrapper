@@ -114,8 +114,9 @@ def mutateV2(mut_file, pdb_file, fix_file=None):
     st = structure.StructureReader.read(pdb_file)
 
     with open(mut_file, 'r') as file:
-        mutations = file.readlines()[0]  # eg: chain1:ResidueNumber1:newResidue1, chain2:ResidueNumber2:newResidue2
+        mutations = file.readlines()[0].strip()  # eg: chain1:ResidueNumber1:newResidue1, chain2:ResidueNumber2:newResidue2
         mutations_tokens = mutations.split(',')
+        print(mutations_tokens)
 
     if not fix_file is None:
         with open(fix_file, 'r') as file:
