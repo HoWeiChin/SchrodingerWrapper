@@ -119,8 +119,9 @@ def mutateV2(mut_file, pdb_file, fix_file=None):
 
     if not fix_file is None:
         with open(fix_file, 'r') as file:
-            residues_to_fix = file.readlines()[0]  # eg: 272,495,496,581
+            residues_to_fix = file.readlines()[0].strip()  # eg: 272,495,496,581
             residues_to_fix_tokens = residues_to_fix.split(',')
+            print(residues_to_fix_tokens)
 
     chains = list(st.chain)  # all the polypeptide chains in a list
 
@@ -157,6 +158,7 @@ def mutateV2(mut_file, pdb_file, fix_file=None):
 
                 if not fix_file is None and str(residue.resnum) in residues_to_fix_tokens:
                     one_letter_res = one_letter_res.lower()
+                    print(str(residue.resnum), one_letter_res)
 
                 residue_position_map[residue.resnum] = one_letter_res
 
