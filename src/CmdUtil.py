@@ -327,7 +327,8 @@ def batch_scwrl_v2(scwrl_file: str, pdb_folder: str,
     with open(scwrl_file, 'r') as file:
         lines = file.readlines()
 
-        for line in lines:
+        for i in range(len(lines)):
+            line = lines[i]
             #an eg for line is [pdb:test.pdb,fix:fix.txt,mut:mut.txt,het:het.txt]
             file_tokens = line.split(',')
 
@@ -339,7 +340,7 @@ def batch_scwrl_v2(scwrl_file: str, pdb_folder: str,
 
             pdb_code = pdb_file.split('.')[0] #get test from test.pdb, where test == pdb code
 
-            out_file = f'{pdb_code}_out.pdb'
+            out_file = f'{pdb_code}_{i}_out.pdb'
             out_file = os.path.join(out_folder, out_file)
 
             if len(list(filter(lambda file_token: 'het:' in file_token, file_tokens))) > 0 and \

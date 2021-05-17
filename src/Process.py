@@ -41,12 +41,13 @@ class Process:
 
         count = 1
         with MoonSpinner('Mutating PDBs') as bar:
-            for mut_line in mutations:
 
+            for i in range(len(mutations)):
+                mut_line = mutations[i]
                 pdb_indicator_token = mut_line.split(',')[0]    #for eg: pdb:2EIE.pdb
                 pdb_token = pdb_indicator_token.split(':')[-1]  #for eg: 2EIE.pdb
                 pdb_code = pdb_token.split('.')[0]  #for eg: 2EIE
-                pdb_file_name = f'{pdb_code}_out.pdb'
+                pdb_file_name = f'{pdb_code}_{i}_out.pdb'
 
                 if not pdb_file_name in os.listdir(self.__pdb_folder):
                     count += 1
@@ -72,7 +73,7 @@ class Process:
                                                         new_atom=new_atm, new_atm_ele=new_ele)
                                            )
 
-                print(f'{pdb_file_name} {curr_mutations}')
+                print(f'processing: {pdb_file_name} {curr_mutations}')
                 curr_pdb = PDBFile(pdb_folder=self.__pdb_folder, pdb_file=pdb_file_name)
                 pdb_mutator = PDBMut(curr_pdb, atms_to_chg)
                 mutated_pdb_content = pdb_mutator.mutate_pdb()
