@@ -20,24 +20,24 @@ Sequence file has been loaded
 
 <Timing tag = "Building_Atoms_Sets"  duration = "0.020" />
 
-<Timing tag = "Building_Flexible_Subrotamers"  duration = "0.020" />
+<Timing tag = "Building_Flexible_Subrotamers"  duration = "0.040" />
 
 <Timing tag = "Computing_Symmetry_Operators"  duration = "0.000" />
 
-<Timing tag = "Updating_Self_Energies"  duration = "0.360" />
+<Timing tag = "Updating_Self_Energies"  duration = "0.380" />
 
-<Timing tag = "Computing_Active_Rotamers"  duration = "0.020" />
+<Timing tag = "Computing_Active_Rotamers"  duration = "0.000" />
 
 <Timing tag = "Resolving_Disulfide_Bonds"  duration = "0.000" />
 
 
 Total number of subrotamer interactions = 6265406
 
-<Timing tag = "Updating_Pairwise_Energies"  duration = "4.060" />
+<Timing tag = "Updating_Pairwise_Energies"  duration = "4.220" />
 
 <Timing tag = "Normalizing_Atoms_Sets"  duration = "0.000" />
 
-<Timing tag = "Computing_Interaction_Graph"  duration = "4.480" />
+<Timing tag = "Computing_Interaction_Graph"  duration = "4.660" />
  
 
 <Timing tag = "Building_Atoms_Sets"  duration = "0.020" />
@@ -50,7 +50,7 @@ Total number of subrotamer interactions = 6265406
 
 <Timing tag = "Computing_Active_Rotamers"  duration = "0.000" />
 
-<Timing tag = "Resolving_Disulfide_Bonds"  duration = "0.000" />
+<Timing tag = "Resolving_Disulfide_Bonds"  duration = "0.020" />
 
 
 Total number of subrotamer interactions = 0
@@ -457,7 +457,7 @@ Processing nodes (2 threads involved)..................
 <Trace tag = "Deciding_on_the_root_node" >
 
 Number of combinations = 9e+3
-<Timing tag = "Deciding_on_the_root_node"  duration = "0.000" />
+<Timing tag = "Deciding_on_the_root_node"  duration = "0.020" />
 </Trace>
 <Trace tag = "Top_To_Bottom" >
 
@@ -866,14 +866,14 @@ Total minimal energy of the graph = 2392.51
 
 Warning: Cumulative energy mismatch (perhaps due to edge decompositions) = 0.0374
 
-<Timing tag = "Combinatorial_Search"  duration = "0.100" />
+<Timing tag = "Combinatorial_Search"  duration = "0.120" />
 
-<Timing tag = "Deriving_Optimum"  duration = "0.340" />
+<Timing tag = "Deriving_Optimum"  duration = "0.360" />
 
 <Timing tag = "Saving_to_PDB_file"  duration = "0.020" />
 
 
 Deleting workspace.
 
-<Timing tag = "Scwrl4_Execution"  duration = "4.960" />
+<Timing tag = "Scwrl4_Execution"  duration = "5.140" />
 

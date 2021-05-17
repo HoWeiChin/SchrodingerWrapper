@@ -42,8 +42,11 @@ class Process:
         count = 1
         with MoonSpinner('Mutating PDBs') as bar:
             for mut_line in mutations:
-                pdb_file_name = mut_line.split(',')[0].split('.')[0] + f'_{count}_out.pdb'
 
+                pdb_indicator_token = mut_line.split(',')[0]    #for eg: pdb:2EIE.pdb
+                pdb_token = pdb_indicator_token.split(':')[-1]  #for eg: 2EIE.pdb
+                pdb_code = pdb_token.split('.')[0]  #for eg: 2EIE
+                pdb_file_name = f'{pdb_code}_out.pdb'
 
                 if not pdb_file_name in os.listdir(self.__pdb_folder):
                     count += 1

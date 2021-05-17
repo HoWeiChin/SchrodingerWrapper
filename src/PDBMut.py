@@ -86,6 +86,6 @@ class PDBMut:
             os.makedirs(out_dir)
 
         pdb_file = self.__pdb_f.file
-
+        print(f'inside save_pdb() {os.path.join(out_dir, pdb_file)}')
         with open(os.path.join(out_dir, pdb_file), "w+") as output:
             output.write(new_content)

@@ -1,6 +1,7 @@
 from progress.spinner import MoonSpinner
 from ScwrlMutant import mutate, mutateV2
 import os
+import re
 from Process import Process
 
 def run_scwrl(
@@ -42,6 +43,7 @@ def run_scwrl(
     else:
         bash_cmd = " ".join([scwrl_exe_path, '-i', full_pdb_path, '-h',
                              '-o', out_pdb, '> log.txt'])
+
     print(f'cmd in run_scwrl() {bash_cmd}')
     os.system(bash_cmd)
 
@@ -62,13 +64,94 @@ def run_scwrl(
 
         os.system(bash_cmd)
 
+def run_scwrl_v2(
+        full_pdb_path,
+        out_pdb,
+        scwrl_exe_path,
+        seq_file_path=None,
+        hetatm_pdb_path=None):
+    """
+    :param full_pdb_path: path of <pdb_code>.pdb
+    :param out_pdb: name of output pdb file
+    :param scwrl_exe_path: path to scwrl exe file
+    :param scwrl_bash_alias: scwrl programme alias, eg: swrl instead of scwrl
+    :param seq_file_path: path to a .txt file telling scwrl how to do mutation
+    :param hetatm_pdb_path: path of hetatm.pdb
+    :return:
+
+    """
+    is_add_het = False
+
+    # no mutation, just add het atoms
+    if seq_file_path is None and hetatm_pdb_path:
+        bash_cmd = " ".join([scwrl_exe_path, '-i', full_pdb_path, '-h',
+                             '-f', hetatm_pdb_path, '-o', out_pdb, '> log.txt'])
+        is_add_het = True
+
+    # mutation and add het atoms
+    elif seq_file_path and hetatm_pdb_path:
+        bash_cmd = " ".join([scwrl_exe_path, '-i', full_pdb_path, '-h', '-s', seq_file_path,
+                             '-f', hetatm_pdb_path, '-o', out_pdb, '> log.txt'])
+        is_add_het = True
+
+    # mutation and don't add het atoms
+    elif seq_file_path and hetatm_pdb_path is None:
+        bash_cmd = " ".join([scwrl_exe_path, '-i', full_pdb_path, '-h', '-s', seq_file_path,
+                             '-o', out_pdb, '> log.txt'])
+
+    # plain side-chain modelling
+    else:
+        bash_cmd = " ".join([scwrl_exe_path, '-i', full_pdb_path, '-h',
+                             '-o', out_pdb, '> log.txt'])
+
+    print(f'cmd in run_scwrl() {bash_cmd}')
+    os.system(bash_cmd)
+
+    if is_add_het:
+
+        with open(out_pdb, 'r') as scwrl_out_pdb:
+            scwrl_out_pdb_lines = scwrl_out_pdb.readlines()
+
+        with open(hetatm_pdb_path, 'r') as het_file:
+            het_lines = het_file.readlines()
+
+        regex_matcher = re.compile('^ATOM')
+
+        for het_line in het_lines:
+            het_line_tokens = re.split('\s+', het_line)
+            atom_type = het_line_tokens[0]
+            element = het_line_tokens[2]
+            res_number = het_line_tokens[5]
+
+            if atom_type == 'HETATM':
+                scwrl_out_pdb_lines.append(het_line)
+                continue
+
+            for i in range(len(scwrl_out_pdb_lines)):
+
+                if not regex_matcher.match(scwrl_out_pdb_lines[i]):
+                    continue
+
+                scwrl_line = scwrl_out_pdb_lines[i]
+                scwrl_out_tokens = re.split('\s+', scwrl_line)
+                atom_type_scwrl = scwrl_out_tokens[0]
+                element_scwrl = scwrl_out_tokens[2]
+                res_number_scwrl = scwrl_out_tokens[5]
+
+                if atom_type == atom_type_scwrl and element == element_scwrl and res_number == res_number_scwrl:
+                    scwrl_out_pdb_lines[i] = het_line
+
+        os.system(''.join(['rm', f'{out_pdb}']))
+
+        with open(f'{out_pdb}', 'w+') as f:
+            for line in scwrl_out_pdb_lines:
+                f.write(line)
 
 def run_prepwizard(prepwiz_exe_path, mae_in, mae_out):
     bash_cmd = " ".join([prepwiz_exe_path, '-nobondorders', '-noccd', '-watdist', '0', '-nometaltreat', '-propka_pH',
                          '7', '-minimize_adj_h', '-fix', '-f', '3', mae_in, mae_out])
 
     os.system(bash_cmd)
-
 
 def check_folder(folder_path: str):
     if not os.path.exists(folder_path):
@@ -132,7 +215,6 @@ def batch_scwrl(scwrl_file: str, pdb_folder: str,
     with open(scwrl_file, 'r') as file:
         lines = file.readlines()
         row_index = 1
-
 
         for line in lines:
 
@@ -277,7 +359,7 @@ def batch_scwrl_v2(scwrl_file: str, pdb_folder: str,
 
                 mutated_seq_path = mutateV2(mut_file, full_pdb_path, fix_file)
 
-                run_scwrl(full_pdb_path=full_pdb_path,
+                run_scwrl_v2(full_pdb_path=full_pdb_path,
                           out_pdb=out_file,
                           scwrl_exe_path=scwrl_exe,
                           seq_file_path=mutated_seq_path,
@@ -291,6 +373,6 @@ if __name__ == '__main__':
                 out_folder='out_folder', scwrl_exe='/home/howc/Desktop/SWRL/Scwrl4')
     """
     batch_scwrl_v2(scwrl_file='scwrl.txt', pdb_folder='pdb_f', het_atm_folder='het_atm',
-                   seq_folder='seq_f', out_folder='scwrl_out',
+                   seq_folder='seq_f', out_folder='pdb_f/scwrl_out',
                    scwrl_exe='/home/howc/Desktop/SWRL/Scwrl4'
                    )
