@@ -101,7 +101,7 @@ def bonding(struc, center_atm, partners):
         bond_order = partners[partner_atm]
         struc.addBond(center_atm.index, partner_atm.index, bond_order)
 
-def sch_routine(is_cross_link, is_zero_order_bonding, is_check_cu_charge, out_dir, out_name):
+def sch_routine(is_cross_link, is_zero_order_bonding, is_check_cu_charge, out_dir):
     """
 
     :param pdb_path: path to folder containing pdb files (usually after scwrl has been applied)
@@ -114,9 +114,28 @@ def sch_routine(is_cross_link, is_zero_order_bonding, is_check_cu_charge, out_di
 
     #
     #p.process()
+    with open('scwrl.txt', 'r') as scwrl_f:
+        scwrl_txt_rows = scwrl_f.readlines()
+
 
     for mutant in os.listdir(out_dir):
         print(f'Processing pdb {mutant}')
+
+        file_name_tokens = mutant.split('_') #for eg: '2EIE_0_out.mae' to ['2EIE', '0', '_out.mae']
+        row_index = int(file_name_tokens[1]) #for eg '0' from above
+        target_row = scwrl_txt_rows[row_index].strip()
+        mut_file_token = target_row.split(',')[2] #mut:mut2.txt
+        mut_filename = mut_file_token.split(':')[-1] #mut2.txt
+
+        with open('files/' + mut_filename, 'r') as mut_f:
+            mut_content = mut_f.readlines()[0].split(',')
+            mut_seq = []
+            for mut_info in mut_content:
+                mut_seq.append(mut_info.split(':')[2])
+
+        mut_seq = ''.join(mut_seq)
+
+
         full_mutant = os.path.join(out_dir, mutant)
         protein_strucs = list(structure.StructureReader(full_mutant))
         protein_struc = protein_strucs[0]
@@ -174,10 +193,7 @@ def sch_routine(is_cross_link, is_zero_order_bonding, is_check_cu_charge, out_di
         with structure.StructureWriter(pdb_mae_in) as writer:
             writer.append(protein_struc)
 
-        if out_name:
-            pdb_mae_out = out_name.mae
-        else:
-            pdb_mae_out = mutant.split('.')[0] + '.mae'
+        pdb_mae_out = mutant.split('.')[0] + f'_{mut_seq}.mae'
         print(f'{pdb_mae_in} {pdb_mae_out}')
         run_prepwizard(prepwiz_exe_path='$SCHRODINGER/utilities/prepwizard',
                        mae_in=pdb_mae_in,
