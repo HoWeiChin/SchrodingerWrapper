@@ -184,7 +184,7 @@ def sch_routine(is_cross_link, is_zero_order_bonding, is_check_cu_charge, out_di
         with structure.StructureWriter(pdb_mae_in) as writer:
             writer.append(protein_struc)
 
-        pdb_mae_out = mutant.split('.')[0] + f'_{mut_filename}.mae'
+        pdb_mae_out = file_name_tokens[0] + f'_{mut_filename}.mae'
         print(f'{pdb_mae_in} {pdb_mae_out}')
         run_prepwizard(prepwiz_exe_path='$SCHRODINGER/utilities/prepwizard',
                        mae_in=pdb_mae_in,
