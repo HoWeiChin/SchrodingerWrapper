@@ -125,16 +125,7 @@ def sch_routine(is_cross_link, is_zero_order_bonding, is_check_cu_charge, out_di
         row_index = int(file_name_tokens[1]) #for eg '0' from above
         target_row = scwrl_txt_rows[row_index].strip()
         mut_file_token = target_row.split(',')[2] #mut:mut2.txt
-        mut_filename = mut_file_token.split(':')[-1] #mut2.txt
-
-        with open('files/' + mut_filename, 'r') as mut_f:
-            mut_content = mut_f.readlines()[0].split(',')
-            mut_seq = []
-            for mut_info in mut_content:
-                mut_seq.append(mut_info.split(':')[2])
-
-        mut_seq = ''.join(mut_seq)
-
+        mut_filename = mut_file_token.split(':')[-1].split('.')[0] #mut2
 
         full_mutant = os.path.join(out_dir, mutant)
         protein_strucs = list(structure.StructureReader(full_mutant))
@@ -193,7 +184,7 @@ def sch_routine(is_cross_link, is_zero_order_bonding, is_check_cu_charge, out_di
         with structure.StructureWriter(pdb_mae_in) as writer:
             writer.append(protein_struc)
 
-        pdb_mae_out = mutant.split('.')[0] + f'_{mut_seq}.mae'
+        pdb_mae_out = mutant.split('.')[0] + f'_{mut_filename}.mae'
         print(f'{pdb_mae_in} {pdb_mae_out}')
         run_prepwizard(prepwiz_exe_path='$SCHRODINGER/utilities/prepwizard',
                        mae_in=pdb_mae_in,
