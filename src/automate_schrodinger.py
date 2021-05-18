@@ -101,7 +101,7 @@ def bonding(struc, center_atm, partners):
         bond_order = partners[partner_atm]
         struc.addBond(center_atm.index, partner_atm.index, bond_order)
 
-def sch_routine(is_cross_link, is_zero_order_bonding, is_check_cu_charge, out_dir):
+def sch_routine(is_cross_link, is_zero_order_bonding, is_check_cu_charge, out_dir, out_name):
     """
 
     :param pdb_path: path to folder containing pdb files (usually after scwrl has been applied)
@@ -141,6 +141,9 @@ def sch_routine(is_cross_link, is_zero_order_bonding, is_check_cu_charge, out_di
             # note that schrodinger skips TER, hence CU starts at 4831 instead pf 4832
             cu_res = get_residue(protein_struc, pdb_res_code='CU')
             cu_atm = get_atom_from_residue(list(cu_res.atom), 'CU')
+
+            #print("cu_res:", cu_res)
+            #print("cu_atm:", cu_atm)
             tyr_495 = get_residue(protein_struc, res_num=495)
             res_495_atms = list(tyr_495.atom)
             OH_tyr_495_atm = get_atom_from_residue(res_495_atms, 'OH')
@@ -155,20 +158,26 @@ def sch_routine(is_cross_link, is_zero_order_bonding, is_check_cu_charge, out_di
 
             F_tyr_272_atm = get_atom_from_residue(tyr_272_atms, 'F')
 
-            partners = {OH_tyr_495_atm: 0, NE2_his_496_atm: 0,
+            #partners = {OH_tyr_495_atm: 0, NE2_his_496_atm: 0,
+            #            NE2_his_581_atm: 0, F_tyr_272_atm: 0
+            #            }
+            partners = {NE2_his_496_atm: 0,
                         NE2_his_581_atm: 0, F_tyr_272_atm: 0
                         }
 
             bonding(protein_struc, cu_atm, partners)
-
+        
             if not is_equal_formal_charge(cu_atm, 2):
-                raise Exception('CU charge is not 2.')
+                cu_atm.formal_charge = 2
 
         pdb_mae_in = mutant.split('.')[0] + '_sch.mae'
         with structure.StructureWriter(pdb_mae_in) as writer:
             writer.append(protein_struc)
 
-        pdb_mae_out = mutant.split('.')[0] + '.mae'
+        if out_name:
+            pdb_mae_out = out_name.mae
+        else:
+            pdb_mae_out = mutant.split('.')[0] + '.mae'
         print(f'{pdb_mae_in} {pdb_mae_out}')
         run_prepwizard(prepwiz_exe_path='$SCHRODINGER/utilities/prepwizard',
                        mae_in=pdb_mae_in,
@@ -228,7 +237,10 @@ if __name__ == "__main__":
     NE2_his_581_atm = get_atom(atoms, 4393)
     F_tyr_272_atm = get_atom(atoms, 2051)
 
-    partners = {OH_tyr_495_atm: 0, NE2_his_495_atm: 0,
+   # partners = {OH_tyr_495_atm: 0, NE2_his_495_atm: 0,
+   #             NE2_his_581_atm: 0, F_tyr_272_atm: 0
+   #             }
+    partners = {NE2_his_496_atm: 0,
                 NE2_his_581_atm: 0, F_tyr_272_atm: 0
                 }
 
