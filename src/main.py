@@ -1,7 +1,6 @@
 import argparse
 import os
 from CmdUtil import batch_scwrl_v2
-from automate_schrodinger import sch_routine
 from AutoVinaPrep import *
 
 parser = argparse.ArgumentParser()
@@ -10,9 +9,6 @@ parser.add_argument('-pdb', action='store', help='pdb folder for scwrl')
 parser.add_argument('-het', action='store', help='het_atm folder path for scwrl')
 parser.add_argument('-mut', action='store_true', help='enable mutation for scwrl')
 parser.add_argument('-exe', action='store', help='scwrl exe path')
-parser.add_argument('-check_cu', action='store_true', help='check charge of Cu')
-parser.add_argument('-cross_link', action='store_true', help='Cross Linking')
-parser.add_argument('-zero_bond', action='store_true', help='Zero Bonding with CU')
 
 args = parser.parse_args()
 
@@ -59,6 +55,6 @@ sch_routine(pdb_path=out_folder_path, scwrl_file=args.s, is_cross_link=args.cros
 
 #convert_mae_to_pdb()
 prep_ligands()
-prep_proteins(path=out_folder_path)
-bulk_pred_binding_sites(path=out_folder_path)
-bulk_docking(path=out_folder_path)
+prep_proteins(path=out_folder_path, pdbqt_out_folder='pdb_f/pdbqt')
+bulk_pred_binding_sites(path='pdb_f/pdbqt')
+bulk_docking(path='pdb_f/pdbqt')

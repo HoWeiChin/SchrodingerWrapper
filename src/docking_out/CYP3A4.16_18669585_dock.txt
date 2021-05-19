@@ -1,4 +1,4 @@
-receptor = /home/howc/PycharmProjects/pythonProject2/src/pdb_f/scwrl_out/CYP3A4.16.pdbqt
+receptor = pdb_f/pdbqt/CYP3A4.16.pdbqt
 
 center_x = -20.0701
 center_y = -19.1783

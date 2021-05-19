@@ -7,8 +7,8 @@ processing [CYP3A4.7.pdbqt] (1/1)
 ------------------------------------------------------------------------------------------------------------------------
 
 [INFO] ConsoleWriter - processing [CYP3A4.7.pdbqt] (1/1)
-[INFO] Protein - loading protein [/home/howc/PycharmProjects/pythonProject2/src/pdb_f/scwrl_out/CYP3A4.7.pdbqt]
-[INFO] PdbUtils - loading file [/home/howc/PycharmProjects/pythonProject2/src/pdb_f/scwrl_out/CYP3A4.7.pdbqt]
+[INFO] Protein - loading protein [/home/howc/PycharmProjects/pythonProject2/src/pdb_f/pdbqt/CYP3A4.7.pdbqt]
+[INFO] PdbUtils - loading file [pdb_f/pdbqt/CYP3A4.7.pdbqt]
 [INFO] Struct - groups in chain A: 469
 [INFO] Struct - groups in chain A: 469
 [INFO] Struct - 468 groups in chain A
@@ -58,10 +58,10 @@ processing [CYP3A4.7.pdbqt] (1/1)
 [INFO] PocketPredictor - pocket29 -  surf_atoms:   6   points:   3   score:    1.0
 [INFO] PocketPredictor - pocket30 -  surf_atoms:   4   points:   3   score:    0.7
 [INFO] PocketPredictor - pocket31 -  surf_atoms:   7   points:   3   score:    0.7
-[INFO] OldPymolRenderer - copying [/home/howc/PycharmProjects/pythonProject2/src/pdb_f/scwrl_out/CYP3A4.7.pdbqt] to [predicted_binding_sites/visualizations/data/CYP3A4.7.pdbqt]
-[INFO] ConsoleWriter - predicting pockets finished in 0 hours 0 minutes 5.401 seconds
+[INFO] OldPymolRenderer - copying [/home/howc/PycharmProjects/pythonProject2/src/pdb_f/pdbqt/CYP3A4.7.pdbqt] to [predicted_binding_sites/visualizations/data/CYP3A4.7.pdbqt]
+[INFO] ConsoleWriter - predicting pockets finished in 0 hours 0 minutes 5.380 seconds
 [INFO] ConsoleWriter - results saved to directory [/home/howc/PycharmProjects/pythonProject2/src/predicted_binding_sites]
 [INFO] ConsoleWriter - 
 [INFO] ConsoleWriter - ----------------------------------------------------------------------------------------------
-[INFO] ConsoleWriter -  finished successfully in 0 hours 0 minutes 6.762 seconds
+[INFO] ConsoleWriter -  finished successfully in 0 hours 0 minutes 6.661 seconds
 [INFO] ConsoleWriter - ----------------------------------------------------------------------------------------------

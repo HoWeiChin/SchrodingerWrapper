@@ -8,7 +8,6 @@ from CmdUtil import *
 BINDING_COORDS_DIR = 'predicted_binding_sites'
 DOCKING_OUT_DIR = 'docking_out'
 MAE_DIR = os.getcwd()
-MAE_TO_PDB_DIR = os.path.join(os.getcwd(), 'mae_to_pdb')
 BEST_ROW_INDEX = 0 # get first row of the csv file
 DB_PATH = os.path.join(os.getcwd(), 'test_db/test_db_subset_CYP3A4_1tqn.csv')
 LIG_DIR = os.path.join(os.getcwd(), 'Ligands')
@@ -93,17 +92,6 @@ def generate_config(ligand_f, pdb_f):
         f.write('num_modes = 9')
     return out_path
 
-def convert_mae_to_pdb():
-    files = os.listdir(MAE_DIR)
-    mae_files = list(filter(lambda file: '.mae' in file, files))
-
-    mae_file_objects = []
-    for mae_file in mae_files:
-        mae_file_objects.append(MaeFile(mae_file=mae_file, mae_folder=MAE_DIR))
-
-    for mae_file_obj in mae_file_objects:
-        MaeToPDB(mae_file_obj, MAE_TO_PDB_DIR)
-
 def get_ligand_sdfs():
     db_df = pd.read_csv(DB_PATH)
     CID_COL_INDEX = 13
@@ -126,16 +114,12 @@ def prep_ligands():
 
         os.system(f"rm {pdb_path}")
 
-def prep_proteins(path):
-    file_dir = MAE_TO_PDB_DIR
-
-    if not path is None:
-        file_dir = path
+def prep_proteins(path, pdbqt_out_folder):
+    file_dir = path
 
     for protein_pdb in os.listdir(file_dir):
         protein_pdb_path = os.path.join(file_dir, protein_pdb)
-        protein_pdb_to_pdbqt(protein_pdb_path, file_dir)
-        os.system(f"rm {protein_pdb_path}")
+        protein_pdb_to_pdbqt(protein_pdb_path, pdbqt_out_folder)
 
 def pred_binding_site(pdb_f):
     """
@@ -147,20 +131,13 @@ def pred_binding_site(pdb_f):
     os.system(cmd)
 
 def bulk_pred_binding_sites(path):
-    file_dir = MAE_TO_PDB_DIR
-    if not path is None:
-        file_dir = path
-
-    for pdbqt in os.listdir(file_dir):
-        abs_pdb_path = os.path.join(file_dir, pdbqt)
+    for pdbqt in os.listdir(path):
+        abs_pdb_path = os.path.join(path, pdbqt)
         pred_binding_site(abs_pdb_path)
 
 
 def bulk_docking(path):
-    file_dir = MAE_TO_PDB_DIR
-
-    if not path is None:
-        file_dir = path
+    file_dir = path
 
     db_df = pd.read_csv(DB_PATH)
     CID_INDEX = 13
@@ -187,7 +164,6 @@ if __name__ == '__main__':
     # print(get_3d_coords('1gog'))
     #print(get_receptor_text('1gog.pdb'))
     #generate_config('1.pdbqt', '1gog.pdbqt')
-    #convert_mae_to_pdb()
     #get_ligand_sdfs()
     #prep_ligands()
     out_folder_path = os.path.join(os.getcwd(), 'pdb_f/scwrl_out')

@@ -355,7 +355,8 @@ def protein_pdb_to_pdbqt(pdb_f, out_dir):
     :param out_dir (str): abs path to a folder which stores pdbqt version of pdb_f
     :return:
     """
-    out_file = os.path.join(out_dir, pdb_f.replace('.pdb', '.pdbqt'))
+    pdb_filename = pdb_f.split('/')[-1]
+    out_file = os.path.join(out_dir, pdb_filename.replace('.pdb', '.pdbqt'))
     cmd = " ".join([MGL_PY, MGL_PRO_PREP, '-r', pdb_f, '-o', out_file])
     os.system(cmd)
     return out_file
