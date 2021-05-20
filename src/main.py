@@ -54,7 +54,7 @@ sch_routine(pdb_path=out_folder_path, scwrl_file=args.s, is_cross_link=args.cros
 """
 
 #convert_mae_to_pdb()
-prep_ligands()
+prep_ligands(db_path=os.path.join('test_db', args.db))
 prep_proteins(path=out_folder_path, pdbqt_out_folder='pdb_f/pdbqt')
 bulk_pred_binding_sites(path='pdb_f/pdbqt')
-bulk_docking(path='pdb_f/pdbqt')
+bulk_docking(path='pdb_f/pdbqt', db_path=os.path.join('test_db', args.db))

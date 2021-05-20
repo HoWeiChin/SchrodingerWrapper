@@ -1,0 +1,11 @@
+receptor = pdb_f/pdbqt/CYP3A4-L373H.pdbqt
+
+center_x = -19.9639
+center_y = -19.331
+center_z = -11.2427
+
+size_x = 25
+size_y = 25
+size_z = 25
+
+num_modes = 9

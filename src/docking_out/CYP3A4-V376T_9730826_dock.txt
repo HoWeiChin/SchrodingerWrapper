@@ -1,0 +1,11 @@
+receptor = pdb_f/pdbqt/CYP3A4-V376T.pdbqt
+
+center_x = -20.0965
+center_y = -19.4644
+center_z = -11.1027
+
+size_x = 25
+size_y = 25
+size_z = 25
+
+num_modes = 9

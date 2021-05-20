@@ -9,7 +9,7 @@ BINDING_COORDS_DIR = 'predicted_binding_sites'
 DOCKING_OUT_DIR = 'docking_out'
 MAE_DIR = os.getcwd()
 BEST_ROW_INDEX = 0 # get first row of the csv file
-DB_PATH = os.path.join(os.getcwd(), 'test_db/test_db_subset_CYP3A4_1tqn.csv')
+#DB_PATH = os.path.join(os.getcwd(), 'test_db/test_db_subset_CYP3A4_1tqn.csv')
 LIG_DIR = os.path.join(os.getcwd(), 'Ligands')
 X_COORD_COL = 6
 Y_COORD_COL = 7
@@ -92,8 +92,8 @@ def generate_config(ligand_f, pdb_f):
         f.write('num_modes = 9')
     return out_path
 
-def get_ligand_sdfs():
-    db_df = pd.read_csv(DB_PATH)
+def get_ligand_sdfs(db_path):
+    db_df = pd.read_csv(db_path)
     CID_COL_INDEX = 13
     cids = db_df.iloc[:, CID_COL_INDEX].unique()
 
@@ -101,8 +101,8 @@ def get_ligand_sdfs():
         str_cid = str(int(cid))
         get_sdf_from_pubchem(int(cid), LIG_DIR, str_cid+'.sdf')
 
-def prep_ligands():
-    get_ligand_sdfs()
+def prep_ligands(db_path):
+    get_ligand_sdfs(db_path)
     for lig_sdf in os.listdir(LIG_DIR):
         sdf_path = os.path.join(LIG_DIR, lig_sdf)
         lig_pdb_out = sdf_to_pdb(sdf_path)
@@ -136,10 +136,10 @@ def bulk_pred_binding_sites(path):
         pred_binding_site(abs_pdb_path)
 
 
-def bulk_docking(path):
+def bulk_docking(path, db_path):
     file_dir = path
 
-    db_df = pd.read_csv(DB_PATH)
+    db_df = pd.read_csv(db_path)
     CID_INDEX = 13
     PDB_CODE_INDEX = 1
 
@@ -166,5 +166,6 @@ if __name__ == '__main__':
     #generate_config('1.pdbqt', '1gog.pdbqt')
     #get_ligand_sdfs()
     #prep_ligands()
-    out_folder_path = os.path.join(os.getcwd(), 'pdb_f/scwrl_out')
-    bulk_docking(path=out_folder_path)
+    #out_folder_path = os.path.join(os.getcwd(), 'pdb_f/scwrl_out')
+    prep_ligands(db_path='test_db/single_near_mutant_CYP3A4_db.csv')
+    bulk_docking(path='pdb_f/pdbqt', db_path='test_db/single_near_mutant_CYP3A4_db.csv')
