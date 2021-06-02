@@ -70,8 +70,10 @@ def generate_config(ligand_f, pdb_f):
 
     file_name = f'{pdb_code}_{ligand}_dock.txt'
     out_path = os.path.join(DOCKING_OUT_DIR, file_name)
+
     print('inside generate_config()')
     print(out_path)
+
     with open(out_path, 'w+') as f:
         f.write(receptor_text + '\n')
 
