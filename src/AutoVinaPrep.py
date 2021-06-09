@@ -142,7 +142,7 @@ def bulk_docking(path, db_path):
     file_dir = path
 
     db_df = pd.read_csv(db_path)
-    CID_INDEX = 13
+    CID_INDEX = 14
     PDB_CODE_INDEX = 1
 
     for index, row in db_df.iterrows():
