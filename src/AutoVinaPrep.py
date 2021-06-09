@@ -96,7 +96,7 @@ def generate_config(ligand_f, pdb_f):
 
 def get_ligand_sdfs(db_path):
     db_df = pd.read_csv(db_path)
-    CID_COL_INDEX = 13
+    CID_COL_INDEX = 14
     cids = db_df.iloc[:, CID_COL_INDEX].unique()
 
     for cid in cids:
