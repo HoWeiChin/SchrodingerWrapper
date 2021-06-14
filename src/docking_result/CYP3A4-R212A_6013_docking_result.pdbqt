@@ -1,0 +1,33 @@
+MODEL 1
+REMARK VINA RESULT:      -9.5      0.000      0.000
+REMARK  1 active torsions:
+REMARK  status: ('A' for Active; 'I' for Inactive)
+REMARK    1  A    between atoms: O_1  and  C_10 
+ROOT
+HETATM    1  O   LIG     1     -23.349 -17.081  -5.961  1.00  0.00    -0.293 OA
+HETATM    2  C   LIG     1     -22.772 -20.267 -12.880  1.00  0.00     0.001 C 
+HETATM    3  C   LIG     1     -23.742 -19.768 -13.967  1.00  0.00    -0.014 C 
+HETATM    4  C   LIG     1     -22.356 -19.160 -11.906  1.00  0.00    -0.004 C 
+HETATM    5  C   LIG     1     -23.635 -18.601 -11.205  1.00  0.00     0.002 C 
+HETATM    6  C   LIG     1     -23.309 -17.481 -10.144  1.00  0.00    -0.016 C 
+HETATM    7  C   LIG     1     -25.025 -19.289 -13.276  1.00  0.00     0.012 C 
+HETATM    8  C   LIG     1     -24.730 -18.199 -12.231  1.00  0.00     0.007 C 
+HETATM    9  C   LIG     1     -23.895 -21.067 -14.782  1.00  0.00     0.126 C 
+HETATM   10  C   LIG     1     -21.696 -21.004 -13.673  1.00  0.00     0.008 C 
+HETATM   11  C   LIG     1     -21.365 -19.681 -10.857  1.00  0.00     0.010 C 
+HETATM   12  C   LIG     1     -22.465 -21.639 -14.846  1.00  0.00     0.033 C 
+HETATM   13  C   LIG     1     -22.191 -17.964  -9.212  1.00  0.00    -0.068 C 
+HETATM   14  C   LIG     1     -20.981 -18.586  -9.871  1.00  0.00     0.035 C 
+HETATM   15  C   LIG     1     -23.181 -18.634 -14.863  1.00  0.00     0.018 C 
+HETATM   16  C   LIG     1     -24.600 -17.197  -9.321  1.00  0.00     0.022 C 
+HETATM   17  C   LIG     1     -22.845 -16.167 -10.814  1.00  0.00     0.020 C 
+HETATM   18  C   LIG     1     -24.347 -16.424  -8.036  1.00  0.00     0.084 C 
+HETATM   19  C   LIG     1     -22.221 -17.845  -7.875  1.00  0.00     0.053 C 
+HETATM   20  C   LIG     1     -23.326 -17.135  -7.189  1.00  0.00     0.149 C 
+ENDROOT
+BRANCH   9  21
+HETATM   21  O   LIG     1     -24.430 -20.850 -16.073  1.00  0.00    -0.395 OA
+HETATM   22  H   LIG     1     -25.207 -21.420 -16.192  1.00  0.00     0.210 HD
+ENDBRANCH   9  21
+TORSDOF 1
+ENDMDL

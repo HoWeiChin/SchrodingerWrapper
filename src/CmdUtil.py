@@ -373,13 +373,35 @@ def ligand_pdb_to_pdbqt(pdb_f, out_dir):
     os.system(cmd)
     return out_file
 
+def get_best_pose(docking_result_file):
+    """
+
+    :param docking_result_file: abs path to a docking result txt file
+    eg: docking_out/CYP3A4.3_15634941_dock.txt
+    :return:
+    """
+    new_content = ''
+
+    #get the first and best model
+    with open(docking_result_file, 'r') as file:
+        lines = file.readlines()
+        for line in lines:
+            if 'MODEL 2' in line:
+                break
+            new_content = new_content + line
+
+    with open(docking_result_file, 'w') as file:
+        file.write(new_content)
+
 def docking(ligand_pdbqt, config_txt, pdbqt):
     print('docking....')
     pdbqt = pdbqt.split('/')[-1]
-    out = os.path.join(os.getcwd()+'/docking_result',pdbqt.replace('.pdbqt', '') + '_docking_result.pdbqt')
+    lig_id = ligand_pdbqt.split('/')[-1].split('.')[0]
+    out = os.path.join(os.getcwd()+'/docking_result',pdbqt.replace('.pdbqt', '') + f'_{lig_id}_docking_result.pdbqt')
     print(f' out is {out}')
     cmd = " ".join([VINA, '--config', config_txt, '--ligand', ligand_pdbqt, '--out', out])
     os.system(cmd)
+    get_best_pose(docking_result_file=out)
 
 if __name__ == '__main__':
     """
@@ -391,7 +413,7 @@ if __name__ == '__main__':
     #ligand_pdb_to_pdbqt('1.pdb', os.getcwd())
     #pred_binding_site('pdb_f/1gog.pdb')
     #protein_pdb_to_pdbqt('1gog.pdb', os.getcwd())
-    docking('1.pdbqt', '/home/howc/PycharmProjects/pythonProject2/src/docking_out/1gog_1_dock.txt')
+    docking('Ligands/15634941.pdbqt', 'docking_out/CYP3A4.3_15634941_dock.txt', 'pdb_f/pdbqt/CYP3A4.3.pdbqt')
 
 """
 

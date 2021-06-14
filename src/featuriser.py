@@ -1,3 +1,6 @@
+from origin_type_encoder import OriginTypeEncoder
+from residue_type_encoder import ResidueTypeEncoder
+from element_type_encoder import ElementTypeEncoder
 
 def is_matching_coord(atom, coord):
     """
@@ -92,6 +95,7 @@ def get_feature_vectors_for_a_complex(xml_file_path,
     coord_tag_names = ['ligcoo', 'protcoo', 'watercoo']
 
     atoms_and_features_map = {}  # key atom id from pdb, value: {'atom_type': 'H', .. etc}
+    atomid_coord_map = {} #key: atom id, value: coord (tuple of float)
 
     for non_covalent_interaction_tag_name in non_covalent_interaction_tag_names:
 
@@ -108,6 +112,8 @@ def get_feature_vectors_for_a_complex(xml_file_path,
 
                 atom_id, atom_info_map = get_atom_info_from_coord(full_complex_pdb_file_path, coord, coord_tag_name)
 
+                if atom_id not in atomid_coord_map:
+                    atomid_coord_map[atom_id] = coord
                 # if the atom_id reppear, origin_type will stay the same
                 # but there is a new non-covalent interactions
                 if atom_id in atoms_and_features_map:
@@ -126,7 +132,125 @@ def get_feature_vectors_for_a_complex(xml_file_path,
                 atom_info_map[non_covalent_interaction_tag_name] = 1
                 atoms_and_features_map[atom_id] = atom_info_map
 
-    return atoms_and_features_map
+    return atoms_and_features_map, atomid_coord_map
 
-#data_map = get_feature_vectors_for_a_complex(xml_file_path='protein_ligand_pdb/xml/CYP3A4-A370F_3035604_complex/report.xml')
+def encoding(data_map):
+    """
 
+    :param data_map (dict): key (str): atom_string, value (dict): atom features
+    eg: {'lig_atm_11': {'element_type': 'OA',
+                        'residue_type': None,
+                        'hydrophobic_interactions': 0,
+                        'hydrogen_bonds': 1,
+                        'water_bridges': 0,
+                        'pi_stacks': 0,
+                        'pi_cation_interactions': 0,
+                        'halogen_bonds': 0,
+                        'salt_bridges': 0,
+                        'metal_complexes': 0,
+                        'origin_type': 'lig'
+                        },
+        'prot_atm_1466': {'element_type': 'N',
+                          'residue_type': 'ARG',
+                          'hydrophobic_interactions': 0,
+                          'hydrogen_bonds': 1,
+                          'water_bridges': 0,
+                          'pi_stacks': 0,
+                          'pi_cation_interactions': 0,
+                          'halogen_bonds': 0,
+                          'salt_bridges': 0,
+                          'metal_complexes': 0,
+                          'origin_type': 'prot'}
+        }
+    :return:
+    """
+    import numpy as np
+
+    feature_matrix = [] # note: component of each row vector == feature
+    atom_row_index_map = {}
+    row = 0
+
+    origin_encoder = OriginTypeEncoder()
+    residue_type_encoder = ResidueTypeEncoder()
+    element_type_enconder = ElementTypeEncoder()
+
+    for vertex in data_map:
+        features_map = data_map[vertex]
+        feature_vector = []
+
+        for feature in sorted(features_map.keys()):
+
+            feature_value = features_map[feature]
+            value_to_append = feature_value
+
+            #override value_to_append if the following conditions hold
+            if feature == 'origin_type':
+                origin_type_encoding = origin_encoder.get_encoding(feature_value.strip())
+                value_to_append = origin_type_encoding
+
+            elif feature == 'residue_type':
+                if feature_value is not None:
+                    feature_value = feature_value.capitalize().strip()
+
+                residue_type_encoding = residue_type_encoder.get_encoding(feature_value)
+                value_to_append = residue_type_encoding
+
+            elif feature == 'element_type':
+                element_type_encoding = element_type_enconder.get_encoding(feature_value.strip())
+                value_to_append = element_type_encoding
+
+            feature_vector.append(value_to_append)
+
+        atom_row_index_map[row] = vertex
+        row += 1
+        feature_matrix.append(feature_vector)
+
+    return np.array(feature_matrix), atom_row_index_map
+
+def create_vanilla_adj_mat(atom_id_coord_map):
+    """
+
+    :param atom_id_coord_map: key: string data for atom_id, value: tuple of float.
+    eg:
+    {'lig_atm_4016': (-21.041, -20.304, -14.444),
+    'prot_atm_1466': (-22.494, -19.499, -11.466),
+    'lig_atm_4006': (-23.823, -24.061, -15.347),
+    'prot_atm_2255': (-23.343, -27.451, -17.477),
+    'prot_atm_2715': (-22.393, -20.498, -18.287)}
+
+    :return:
+    """
+    import numpy as np
+    dim = len(atom_id_coord_map)
+    adj_mat = np.zeros((dim, dim))  #because dim of adj mat is dim * dim, a square matrix.
+    atom_component_map = {} #key: atom id, value: ith component, for example is atom_id 1 in the first dim, 2nd dim or 3rd dim etc
+
+    for index, atom_id in enumerate(atom_id_coord_map):
+        atom_component_map[atom_id] = index
+
+    visited_i_j_pair = set()
+    for atom_id in atom_id_coord_map:
+        for neighbour in atom_id_coord_map:
+            if atom_id == neighbour or (atom_id, neighbour) in visited_i_j_pair:
+                continue
+
+            if (atom_id, neighbour) not in visited_i_j_pair:
+                visited_i_j_pair.add((atom_id, neighbour))
+                visited_i_j_pair.add((neighbour, atom_id))
+
+            i = atom_component_map[atom_id]
+            j = atom_component_map[neighbour]
+            i_coord_vec = np.array(atom_id_coord_map[atom_id]) #vectorise the coords for i,j vertices
+            j_coord_vec = np.array(atom_id_coord_map[neighbour])
+            adj_mat[i, j] = np.linalg.norm(i_coord_vec - j_coord_vec)
+            adj_mat[j, i] = np.linalg.norm(i_coord_vec - j_coord_vec)
+    return adj_mat, atom_component_map
+
+
+data_map, atom_id_coord_map = get_feature_vectors_for_a_complex(xml_file_path='protein_ligand_pdb/xml/CYP3A4-A370F_3035604_complex/report.xml')
+
+feature_mat, _ = encoding(data_map)
+adj_mat, atom_component_map = create_vanilla_adj_mat(atom_id_coord_map)
+print(adj_mat)
+print(atom_component_map)
+print(atom_id_coord_map)

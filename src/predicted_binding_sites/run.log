@@ -58,9 +58,9 @@ processing [CYP3A4.11.pdbqt] (1/1)
 [INFO] PocketPredictor - pocket29 -  surf_atoms:   4   points:   3   score:    0.7
 [INFO] PocketPredictor - pocket30 -  surf_atoms:   7   points:   3   score:    0.7
 [INFO] OldPymolRenderer - copying [/home/howc/PycharmProjects/pythonProject2/src/pdb_f/pdbqt/CYP3A4.11.pdbqt] to [predicted_binding_sites/visualizations/data/CYP3A4.11.pdbqt]
-[INFO] ConsoleWriter - predicting pockets finished in 0 hours 0 minutes 5.739 seconds
+[INFO] ConsoleWriter - predicting pockets finished in 0 hours 0 minutes 6.005 seconds
 [INFO] ConsoleWriter - results saved to directory [/home/howc/PycharmProjects/pythonProject2/src/predicted_binding_sites]
 [INFO] ConsoleWriter - 
 [INFO] ConsoleWriter - ----------------------------------------------------------------------------------------------
-[INFO] ConsoleWriter -  finished successfully in 0 hours 0 minutes 6.824 seconds
+[INFO] ConsoleWriter -  finished successfully in 0 hours 0 minutes 7.145 seconds
 [INFO] ConsoleWriter - ----------------------------------------------------------------------------------------------

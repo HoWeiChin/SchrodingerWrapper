@@ -25,6 +25,7 @@ elif args.db is None:
 
 elif args.exe is None:
     print('You forgot to provide a scwrl exe file.')
+"""
 
 elif args.het is None and not args.mut:
     batch_scwrl_v2(db_file=args.db, pdb_folder=args.pdb,
@@ -45,7 +46,7 @@ elif args.het and args.mut:
     batch_scwrl_v2(db_file=args.db, pdb_folder=args.pdb,
                het_atm_folder=args.het, seq_folder='seq_f',
                out_folder=out_folder_path, scwrl_exe=args.exe)
-
+"""
 """
 sch_routine(pdb_path=out_folder_path, scwrl_file=args.s, is_cross_link=args.cross_link,
                 is_zero_order_bonding=args.zero_bond, is_check_cu_charge=args.check_cu,
@@ -55,6 +56,6 @@ sch_routine(pdb_path=out_folder_path, scwrl_file=args.s, is_cross_link=args.cros
 
 #convert_mae_to_pdb()
 prep_ligands(db_path=os.path.join('test_db', args.db))
-prep_proteins(path=out_folder_path, pdbqt_out_folder='pdb_f/pdbqt')
-bulk_pred_binding_sites(path='pdb_f/pdbqt')
+#prep_proteins(path=out_folder_path, pdbqt_out_folder='pdb_f/pdbqt')
+#bulk_pred_binding_sites(path='pdb_f/pdbqt')
 bulk_docking(path='pdb_f/pdbqt', db_path=os.path.join('test_db', args.db))
