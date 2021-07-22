@@ -137,7 +137,6 @@ def bulk_pred_binding_sites(path):
         abs_pdb_path = os.path.join(path, pdbqt)
         pred_binding_site(abs_pdb_path)
 
-
 def bulk_docking(path, db_path):
     file_dir = path
 
@@ -162,12 +161,37 @@ def bulk_docking(path, db_path):
         print(config_txt_path)
         docking(ligand_pdbqt_path, config_txt_path, protein_pdbqt_path)
 
+def bulk_flex_docking(path, db_path):
+    file_dir = path
+
+    db_df = pd.read_csv(db_path)
+    CID_INDEX = 14
+    PDB_CODE_INDEX = 1
+
+    for index, row in db_df.iterrows():
+        pdb_code = row[PDB_CODE_INDEX]
+
+        ligand_cid = row[CID_INDEX]
+        print(f'pdb code: {pdb_code} ligand cid: {ligand_cid} in docking')
+
+
+        ligand_pdbqt = list(filter(lambda lig_pdbqt: str(int(ligand_cid)) in lig_pdbqt, os.listdir(LIG_DIR)))[0]
+        protein_pdbqt = list(filter(lambda prot_pdbqt: pdb_code in prot_pdbqt, os.listdir(file_dir)))[0]
+
+        ligand_pdbqt_path = os.path.join(LIG_DIR, ligand_pdbqt)
+        protein_pdbqt_path = os.path.join(file_dir, protein_pdbqt)
+        protein_flex_pdbqt_path = protein_pdb_to_flex_pdbqt(f'pdb_f/scwrl_out/{pdb_code}.pdb', path)
+        config_txt_path = generate_config(ligand_pdbqt_path, protein_pdbqt_path)
+        print(config_txt_path)
+        flexible_docking(ligand_pdbqt_path, config_txt_path, protein_pdbqt_path, protein_flex_pdbqt_path)
+
 if __name__ == '__main__':
-    # print(get_3d_coords('1gog'))
+    print(get_3d_coords('1gog'))
     #print(get_receptor_text('1gog.pdb'))
-    #generate_config('1.pdbqt', '1gog.pdbqt')
+    #generate_config('Fluconazole.pdbqt', 'CYP3A4.12.pdbqt')
     #get_ligand_sdfs()
     #prep_ligands()
     #out_folder_path = os.path.join(os.getcwd(), 'pdb_f/scwrl_out')
-    prep_ligands(db_path='test_db/single_near_mutant_CYP3A4_db.csv')
-    bulk_docking(path='pdb_f/pdbqt', db_path='test_db/single_near_mutant_CYP3A4_db.csv')
+    #prep_ligands(db_path='test_db/single_near_mutant_CYP3A4_db.csv')
+    #bulk_docking(path='pdb_f/pdbqt', db_path='test_db/single_near_mutant_CYP3A4_db.csv')
+    #pred_binding_site('pdb_f/1gog.pdb')

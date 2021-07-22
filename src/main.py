@@ -17,6 +17,7 @@ if args.pdb == None:
 
 out_folder_path = os.path.join(os.getcwd(), args.pdb + '/scwrl_out')
 
+
 if not args.het and args.check_cu and args.zero_bond:
     raise Exception('het atom folder must be given, to enable checking for CU charge and zero order boding with CU.')
 
@@ -25,6 +26,7 @@ elif args.db is None:
 
 elif args.exe is None:
     print('You forgot to provide a scwrl exe file.')
+
 """
 
 elif args.het is None and not args.mut:
@@ -55,7 +57,9 @@ sch_routine(pdb_path=out_folder_path, scwrl_file=args.s, is_cross_link=args.cros
 """
 
 #convert_mae_to_pdb()
-prep_ligands(db_path=os.path.join('test_db', args.db))
+#prep_ligands(db_path=os.path.join('test_db', args.db))
 #prep_proteins(path=out_folder_path, pdbqt_out_folder='pdb_f/pdbqt')
 #bulk_pred_binding_sites(path='pdb_f/pdbqt')
-bulk_docking(path='pdb_f/pdbqt', db_path=os.path.join('test_db', args.db))
+#bulk_docking(path='pdb_f/pdbqt', db_path=os.path.join('test_db', args.db))
+bulk_flex_docking(path='pdb_f/pdbqt', db_path=os.path.join('test_db', args.db))
+
