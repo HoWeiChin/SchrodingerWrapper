@@ -452,9 +452,9 @@ def docking(ligand_pdbqt, config_txt, pdbqt):
     get_best_pose(docking_result_file=out)
 
 
-def protein_pdb_to_flex_pdbqt(pdb_f, out_dir):
+def protein_pdb_to_flex_pdbqt(pdb_f, out_dir='pdb_f/pdbqt_flex'):
     pdb_filename = pdb_f.split('/')[-1]
-    flex_out_file = os.path.join(out_dir, pdb_filename.replace('.pdb', '_flex.pdb'))
+    flex_out_file = os.path.join(out_dir, pdb_filename.replace('.pdbqt', '_flex.pdbqt'))
     flex_residues = 'LYS209_LEU210_LEU211_ARG212_PHE213_ASP214_PHE215_LEU216_ASP217'
 
     cmd_flex = " ".join([MGL_PY, MGL_FLEX_PRO_PREP, '-r', pdb_f, '-s', flex_residues, '-x', flex_out_file])
@@ -469,7 +469,7 @@ def flexible_docking(ligand_pdbqt, config_txt, rigid_prot_pdbqt, flex_prot_pdbqt
     lig_id = ligand_pdbqt.split('/')[-1].split('.')[0]
     out = os.path.join(os.getcwd() + '/docking_result',
                        pdbqt.replace('.pdbqt', '') + f'_{lig_id}_32_size_30_flex_docking_result.pdbqt')
-    out_log = os.path.join(os.getcwd() + '/docking_result',
+    out_log = os.path.join(os.getcwd() + '/vina_logs',
                            pdbqt.replace('.pdbqt', '') + '_vina_flex.log')
     print(f' out is {out}')
     # vina forcefield
