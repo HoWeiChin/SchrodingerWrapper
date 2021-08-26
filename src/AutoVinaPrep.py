@@ -85,9 +85,9 @@ def generate_config(ligand_f, pdb_f):
 
         f.write('\n')
 
-        f.write('size_x = 25' + '\n')
-        f.write('size_y = 25' + '\n')
-        f.write('size_z = 25' + '\n')
+        f.write('size_x = 30' + '\n')
+        f.write('size_y = 30' + '\n')
+        f.write('size_z = 30' + '\n')
 
         f.write('\n')
 
@@ -167,26 +167,97 @@ def bulk_flex_docking(path, db_path):
     db_df = pd.read_csv(db_path)
     CID_INDEX = 14
     PDB_CODE_INDEX = 1
+    processed_mt = set([ log.split('_')[0] for log in os.listdir('vina_logs') ])
 
     for index, row in db_df.iterrows():
         pdb_code = row[PDB_CODE_INDEX]
 
-        ligand_cid = row[CID_INDEX]
-        print(f'pdb code: {pdb_code} ligand cid: {ligand_cid} in docking')
+        if pdb_code in processed_mt:
+            continue
 
+        ligand_cid = row[CID_INDEX]
+
+        print(f'pdb code: {pdb_code} ligand cid: {ligand_cid} in docking')
 
         ligand_pdbqt = list(filter(lambda lig_pdbqt: str(int(ligand_cid)) in lig_pdbqt, os.listdir(LIG_DIR)))[0]
         protein_pdbqt = list(filter(lambda prot_pdbqt: pdb_code in prot_pdbqt, os.listdir(file_dir)))[0]
 
         ligand_pdbqt_path = os.path.join(LIG_DIR, ligand_pdbqt)
         protein_pdbqt_path = os.path.join(file_dir, protein_pdbqt)
-        protein_flex_pdbqt_path = protein_pdb_to_flex_pdbqt(f'pdb_f/scwrl_out/{pdb_code}.pdb', path)
+
+        protein_flex_pdbqt_path = protein_pdb_to_flex_pdbqt(f'pdb_f/pdbqt/{pdb_code}.pdbqt')
+
+        print(f'protein.pdbqt: {protein_pdbqt} flex.pdbqt: {protein_flex_pdbqt_path}')
         config_txt_path = generate_config(ligand_pdbqt_path, protein_pdbqt_path)
-        print(config_txt_path)
+        print(f'config text is: {config_txt_path}')
         flexible_docking(ligand_pdbqt_path, config_txt_path, protein_pdbqt_path, protein_flex_pdbqt_path)
 
+def generate_protein_complex_pdb_file():
+    import re
+    pattern = re.compile('^HETATM')
+    atm_pattern = re.compile('^ATOM')
+
+    for docking_result in os.listdir('docking_result'):
+        # generate pdb equivalent of pdbqt
+        docking_result_pdb = docking_result.replace('.pdbqt', '.pdb')
+        cmd = ' '.join(['cut', '-c-66', f'docking_result/{docking_result}', '>', f'docking_result/{docking_result_pdb}'])
+        os.system(cmd)
+        ligand_pose_info = ''
+        res_info = {}
+
+        with open('docking_result/' + docking_result_pdb, 'r') as file:
+            lines = file.readlines()
+
+        for line in lines:
+            if pattern.match(line):
+                line_tokens = line.split(' ')
+                #print(line_tokens)
+                #print(' '.join(line_tokens))
+                line_tokens[-2] = '      '
+                line_tokens[-1] = '\n'
+                ligand_pose_info = ligand_pose_info + ' '.join(line_tokens)
+
+            elif atm_pattern.match(line):
+                tokens = re.split("\s{1,}", line)
+                key = (tokens[2], tokens[3], tokens[4], tokens[5])
+
+                res_info[key] = line
+
+        pdb = docking_result.split('_')[0]
+        ligand = docking_result.split('_')[1]
+
+        scwrl_file = list(filter(lambda file: pdb in file, os.listdir('pdb_f/scwrl_out')))[0]
+
+        pdb_info = ''
+        if docking_result_pdb == 'CYP3A4-A305V_6013_32_size_30_flex_docking_result.pdb':
+            print(ligand_pose_info)
+
+        with open('pdb_f/scwrl_out/' + scwrl_file, 'r') as file:
+            for line in file.readlines():
+                if atm_pattern.match(line):
+
+                    tokens = re.split("\s{1,}", line)
+                    key = (tokens[2], tokens[3], tokens[4], tokens[5])
+
+                    if key in res_info:
+                        tokens_2 = re.split("\s{1,}", res_info[key])
+                        tokens[6] = tokens_2[6]
+                        tokens[7] = tokens_2[7]
+                        tokens[8] = tokens_2[8]
+                        pdb_info = pdb_info + ' '.join(tokens)
+                    else:
+                        pdb_info = pdb_info + line
+                else:
+                    pdb_info = pdb_info + line
+
+        with open(f'protein_ligand_pdb_flex_docking/{pdb}_{ligand}_complex.pdb',
+                  'w+') as file:
+            file.write(pdb_info)
+            file.write('\n')
+            file.write(ligand_pose_info)
+
 if __name__ == '__main__':
-    print(get_3d_coords('1gog'))
+    #print(get_3d_coords('1gog'))
     #print(get_receptor_text('1gog.pdb'))
     #generate_config('Fluconazole.pdbqt', 'CYP3A4.12.pdbqt')
     #get_ligand_sdfs()
@@ -195,3 +266,5 @@ if __name__ == '__main__':
     #prep_ligands(db_path='test_db/single_near_mutant_CYP3A4_db.csv')
     #bulk_docking(path='pdb_f/pdbqt', db_path='test_db/single_near_mutant_CYP3A4_db.csv')
     #pred_binding_site('pdb_f/1gog.pdb')
+    #pred_binding_site()
+    generate_protein_complex_pdb_file()
